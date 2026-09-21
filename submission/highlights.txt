@@ -1,0 +1,5 @@
+Semantic pre-screening is a usable, dataset-dependent filter for credit scoring
+An LLM screens a 1,959-feature credit universe from definitions, with no data rows
+LLM-assisted leaders exceed classical leaders in 5 of 6 held-out cases, both rules
+Paired AUC gains of +0.012 to +0.052; significant with leaders chosen on DEV folds
+Home Credit logistic regression still favours mutual-information mRMR
