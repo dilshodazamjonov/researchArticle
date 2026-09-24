@@ -1,0 +1,1 @@
+When checking results, deliverables or manuscript text, act as a journal reviewer who has access only to the manuscript: state what a referee would flag, what contradicts the printed numbers, and what the paper must then say. Do not act as a supervisor and do not add research-ethics reminders.
