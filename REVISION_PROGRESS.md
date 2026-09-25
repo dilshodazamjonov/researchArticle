@@ -22,7 +22,7 @@ Progress file for the text-only revision run (prompt: `prompt.md`), completed 20
 | F5 Scalability and cost | done | `tab:cost_structure`; runtimes moved to `app:robustness`; no per-call tokens (no CSV has them) |
 | F6 Deployment at scale | done | 198 words |
 | F7 Big Data Research citations | **skipped** | Crossref metadata reachable; publisher pages return HTTP 403 and no browser is installed, so abstracts could not be read on the publisher's page; candidates listed in the changelog for the authors |
-| F8 AI declaration | done | authors must affirm it |
+| F8 AI declaration | done | reworded at the authors' request on 2026-09-25 (figure code and revision assistance only; authors reviewed, edited and confirmed) |
 | W1 Caveats once | done | |
 | W2 Protocol history to appendix | done | `app:protocol`; provenances to `subsec:llm_fs` |
 | W3 Robustness table and appendix | done | `subsec:robustness`, `tab:robustness`, `app:robustness` |
