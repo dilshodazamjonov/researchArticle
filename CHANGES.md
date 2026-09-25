@@ -16,8 +16,10 @@ Revision of the Big Data Research manuscript, prompts 1 to 3. Branch `revision-p
 - `baseline/tables.json`: `tools/extract_tables.py` run on both baseline files.
 - `metrics_after_p1.json`: `tools/measure.py` run on the files after Prompt 1, plus the compile record.
 - `metrics_after_p2.json`: the same, after Prompt 2.
+- `metrics_final.json`: the same, after Prompt 3.
+- `revised.pdf`: the final compiled manuscript (pdflatex twice), also copied to `submission/manuscript.pdf`.
 
-**Tools.** All four use the Python 3 standard library only.
+**Tools.** All five use the Python 3 standard library only.
 
 ### `tools/measure.py`
 
@@ -129,6 +131,20 @@ Usage: `python3 tools/check_p2.py --p1-commit 901c263 [--compile-dir DIR | --log
 - P6: sentences of Sections 2–8 over 45 and over 60 words.
 - P7: Conclusion words, and the location of "522" in the running text of Sections 2–8.
 - P8: byte comparison of the Introduction, abstract, keywords and highlights block with the Prompt 1 commit.
+
+### `tools/check_p3.py`
+
+Usage: `python3 tools/check_p3.py [--compile-dir DIR | --log LOG] [-o REPORT.json]`. It runs checks S1–S5 and F1–F9 of Prompt 3 on `submission/manuscript.tex` against `baseline/`.
+- S3: compares table bodies and column specifications with `baseline/tables.json`. The only difference allowed is the one row inserted into `tab:robustness` in Prompt 1, with the existing rows unchanged and in order; `tab:response_spread` received a note only.
+- F1: word reductions of the Sections 1–8 span (`sections_1_8`, Introduction to `\appendix`) and of the numbered sections only, both of which must reach 25%, and of the Introduction, which must reach 20%.
+- F2: takes the numeric tokens of the baseline abstract plus the Sections 1–8 span (text, captions, notes and cells). Each must occur in the new main file, or appear in back-quotes under a "Removed duplicates" heading of this file.
+- F3: abstract of 250 words or fewer; 3–5 highlights of 85 characters or fewer; the same seven keywords as the baseline.
+- F4: every numeric token of the abstract, the highlights and the Conclusion must appear in back-quotes under the "Number trace" heading.
+- F5: phrase counts over the abstract plus Sections 1–8, in the three scopes of `check_p2.py`, against the Prompt 3 limits.
+- F6: every paragraph of the abstract, Sections 1–8 and the appendices that cites the matched timing measurement (a match for `522`, `matched ... measurement` or `matched conditions`) must say "unscreened 1,959-feature universe". "522" may appear only in the abstract, once in the Introduction and in `subsec:cost_runtime`.
+- F7: the Introduction's `enumerate` has 4 items or fewer, with 2 sentences or fewer each; the C4 sentence and the C5 paragraph must be present.
+- F8: as S6(1) of Prompt 1, over the whole document.
+- F9: no sentence over 60 words in Sections 1–8; Conclusion of 380 words or fewer.
 
 ## Prompt 1
 
@@ -413,6 +429,194 @@ Run with `python3 tools/check_p2.py --p1-commit 901c263 --compile-dir <scratch>`
 
 ## Prompt 3
 
+### Step 0: precheck
+
+- On branch `revision-presentation` at `d647fa9`. The Prompt 1 and Prompt 2 self-checks are all PASS. The one Prompt 2 residual (a protected table cell) is under Unresolved. `tools/` was present.
+- No earlier edit was undone. The Prompt 1 corrections still pass their Prompt 1 tests on the final text (F6 and F8 below).
+
+### Step 1: framing for Big Data Research
+
+**Scope.** Edits were confined to the Introduction, abstract, highlights, keywords, §6.7, §7.5, §7.7 and the Conclusion's next steps, plus the Step 3 consistency fixes in §7.1 and §8.
+
+**C1.** The Introduction now opens with the scale problem:
+- universes of hundreds to thousands of predictors on up to 1.5 million decisions;
+- supervised selection recomputed in every fold and refit;
+- each of the nine target-aware selectors refitted six times per case, the counts derived under Derived numbers.
+
+It then poses the question: can a row-independent semantic stage shrink the space supervised selection must search without losing held-out discrimination? The single Introduction mention of the 522 s / 21 s measurement now says "unscreened 1,959-feature universe" (Prompt 1, A6).
+
+**C2.** The contributions are now a numbered list of four items, of two, two, one and one sentences:
+1. the frozen held-out comparison under three leader rules;
+2. the cost-structure argument, stated as one design-level analysis (Table F.5) plus one matched runtime measurement over the unscreened universe, "not a scaling study";
+3. the information contract and the separate outcomes;
+4. the protocol account, with the pre-declared voting family.
+
+RQ1 and RQ2 are kept.
+
+**C3.** The Introduction was cut from 898 to 615 words (−31.5%).
+- Three caveats were removed and replaced by pointers: the HO labelling (§5.2), the descriptive HO rule (§5.6) and protocol evolution (§4.6).
+- The rule names HO, DEV and mixed are used.
+- The research-gap statement became a pointer to Related Work, which states it.
+- The roadmap now covers §6.1–§6.7, including the new §6.2 and §6.3.
+- The voting appendix is cited in contribution 4.
+
+**C4.** Added to §7.5: "A univariate filter such as IV, also a single pass over the rows, would shrink the mRMR pool by the same factor. The semantic stage is distinctive not for speed over every possible pre-screen but because it reads no rows, is cached and reused across refits and contributes semantic content."
+
+**C5.** A new paragraph in §7.7 states what was not measured about scale:
+- no scaling curve over rows or features, only the one matched measurement over the unscreened universe;
+- the token usage of the Stability 2024 call, which was not recorded;
+- variable books much larger than 1,068 candidates, where context-window limits and chunked prompting arise, which are untested.
+
+The §7.5 sentence on "particular runs at the list prices of the time" moved into it. The next steps of §8 gained "a scaling study over rows, features and larger variable books"; the Conclusion is 361 words.
+
+**C6.** The keywords are the same seven, reordered: Big data; High-dimensional data; Credit scoring; Feature selection; Large language models; Temporal validation; Selection stability.
+
+**C7.** The title is unchanged. Alternatives are proposed under Author decisions.
+
+**Other in-scope trims** to keep Sections 1–8 at least 25% shorter after the additions:
+- §6.7: the per-dataset call counts "6 on Home Credit and 24 on LendingClub" were dropped; they are stated in §4.4.
+- §7.5: one sentence was merged.
+- §7.7: two clauses that repeated §7.1 and §5.1 were dropped.
+
+### Step 2: abstract and highlights
+
+**B9.** The abstract was rewritten in 248 words, following the prescribed arc:
+- problem and scale;
+- what the LLM reads, and why its cost does not grow with the number of decisions;
+- datasets, backbones and budgets;
+- the result under the three rules, with the HO-rule and DEV-rule ranges and the mixed rule;
+- the development-to-holdout finding;
+- the Home Credit LR exception (−0.010 to −0.027);
+- the LendingClub LR response caveat (Prompt 1, A1);
+- one scope sentence (protocol evolved with held-out knowledge; no hypothesis test for these comparisons);
+- the implication.
+
+The 522 s / 21 s measurement is no longer in the abstract (Author decisions). The comment above the abstract now reads "now 248".
+
+**B10.** Five highlights, 77–84 characters each, in the comment block and in `submission/highlights.txt`:
+- An LLM ranks up to 1,068 candidate credit features from definitions, reading no rows
+- The semantic stage's cost depends on the variable book, not the number of decisions
+- LLM-assisted leaders win 5 of 6 held-out cases under three leader-choice rules
+- LLM-assisted subsets lose less AUC from development to holdout than classical ones
+- Home Credit logistic regression favours the classical leader under every rule
+
+### Step 3: consistency pass
+
+The abstract, highlights, contributions, §6.1, §6.2, §7.1 and §8 were read together. They now make the same claims with the same numbers:
+- five of six under every rule;
+- +0.012 to +0.051 under the HO rule and +0.013 to +0.052 under the DEV rule (`tab:primary_results`, `tab:confirmatory`);
+- the mixed rule reproducing the HO-rule margins;
+- the smaller development-to-holdout loss;
+- Home Credit LR won by the classical leader under every rule;
+- on LendingClub LR, a margin that rests on a favourable cached response.
+
+Fixes, all in prose:
+- §7.1: "where mutual-information mRMR leads by 0.021" became "where the classical leader is ahead under every rule". The first form was true only under the HO rule.
+- §8: "the exception, won by mutual-information mRMR" became "the exception, where the classical leader was ahead under every rule".
+- Highlight 1 said the LLM pre-screens "a 1,959-feature universe", but the LLM reads the 1,068 screened candidates. It now says 1,068.
+
+No sentence contradicts the Prompt 1 correction on response sampling (F8).
+
+### Number trace
+
+Every number in the abstract, the highlights and the Conclusion, with its source:
+
+| Number | Where | Source |
+|---|---|---|
+| `+0.012`, `+0.051` | abstract, §8 | smallest and largest positive HO-rule ΔAUC: +0.012024 (Home Credit CatBoost) and +0.050517 (LendingClub CatBoost), `tab:primary_results` |
+| `+0.013`, `+0.052` | abstract, §8 | smallest and largest positive DEV-rule ΔAUC: +0.013006 (Stability 2024 LR) and +0.051702 (LendingClub CatBoost), `tab:confirmatory` |
+| `-0.010`, `-0.027` | abstract | Home Credit LR under the DEV rule (−0.010179, `tab:confirmatory`) and the mixed rule (−0.027, §6.1 and `tab:robustness`). The HO rule's −0.021 lies between them (`tab:primary_results`) |
+| `1,959` | abstract | Stability 2024 universe, `tab:datasets` |
+| `1,526,659` | abstract | Stability 2024 decisions, DEV + HO, §5.2 |
+| `2024` | abstract | dataset name (Home Credit Model Stability 2024) |
+| `20`, `40` | abstract, §8 | budgets $\Kfeat$, §5.4 |
+| `1,068` | highlight 1 | Stability 2024 candidate set, the largest list the LLM ranked: `tab:datasets`, §4.4 |
+| `5`, `6` | highlight 3 | five of six cases under all three rules, `tab:primary_results`, `tab:confirmatory`, §6.1 |
+| "twelve" (word) | §8 | the twelve pre-declared voting comparisons, `tab:voting_cross`, §7.2 |
+
+### Step 4: final self-check
+
+Run with `python3 tools/check_p3.py --compile-dir <scratch>`.
+
+| Check | Result | Evidence |
+|---|---|---|
+| S1 | PASS | pdflatex twice, exit 0 on both passes. 0 Overfull `\hbox` (baseline 0); 1 Underfull `\hbox`, as in the baseline. No undefined references or citations. 32 pages (baseline 36). Pass 2 no longer reports "Label(s) may have changed". |
+| S2 | PASS | All 83 baseline labels exist, plus `subsec:dev_to_ho`, `subsec:within_family` and `subsec:governance`. The 55 cite keys are the same set. `thebibliography` is byte-identical. |
+| S3 | PASS | 25 tables compared with `baseline/tables.json`. The only difference is the Prompt 1 row inserted into `tab:robustness`; the 12 existing rows are unchanged and in order, and the column specification is unchanged. `tab:response_spread` has an identical body and gained only a note. |
+| S4 | PASS | The 15 tokens absent from baseline (7 from Prompt 1, 8 from Prompt 2) are all under Derived numbers. Prompt 3 added none. |
+| S5 | PASS | All 14 R6 blocks are identical to baseline, including the title and `pdftitle`. |
+| F1 | PASS | Sections 1–8 span: 16,889 → 12,634 words (−25.2%); numbered sections only: 16,722 → 12,467 (−25.4%). Introduction: 898 → 615 (−31.5%). |
+| F2 | PASS | 592 baseline tokens (abstract plus Sections 1–8, including floats). All survive except `0.027`, `29` and `0.14`, which are listed under "Removed duplicates" (Prompt 2) with where each value survives. |
+| F3 | PASS | Abstract 248 words. 5 highlights of 84, 83, 78, 82 and 77 characters. Keywords are the same seven, with Big data and High-dimensional data first and second. |
+| F4 | PASS | Every number of the abstract (11 tokens), the highlights (3) and the Conclusion (6) is in the Number trace. |
+| F5 | PASS | Abstract plus Sections 1–8, text, captions and notes: "materiality bar" 2 (≤ 7), "covariate-shift" 1 (≤ 4); "held-out rule", "development rule", "development-rule" and "most adversarial" all 0. Counting table cells, "development rule" is 1, in the protected `tab:robustness` cell (Unresolved). |
+| F6 | PASS | "522" appears once in the Introduction and in §6.7, not in the abstract. All seven paragraphs citing the measurement say "unscreened 1,959-feature universe": §1 twice, §3.1, §6.7, §7.5, §7.7 and Appendix F. |
+| F7 | PASS | The contributions are a numbered list of 4 items (2, 2, 1 and 1 sentences). The C4 sentence is in §7.5 and the C5 paragraph in §7.7. |
+| F8 | PASS | Five sentences contain "immaterial": the §5.6 definition, the Stability 2024 sentence, §6.6.1, §7.7 and the `tab:response_spread` note. None claims all three datasets or all four Home Credit and LendingClub cases. |
+| F9 | PASS | No sentence in Sections 1–8 is over 60 words; none is over 45. The Conclusion is 361 words (≤ 380). |
+
+### Final metrics: baseline, after Prompt 1, after Prompt 2, final
+
+Every metric that `tools/measure.py` reports (`baseline/metrics.json`, `metrics_after_p1.json`, `metrics_after_p2.json`, `metrics_final.json`). Paragraph and sentence metrics refer to the Sections 1–8 span.
+
+| Metric | Baseline | After Prompt 1 | After Prompt 2 | Final |
+|---|---|---|---|---|
+| Words, Sections 1–8 (Introduction to \appendix) | 16889 | 17389 | 12822 | 12634 |
+| Words, Sections 1–8, numbered sections only | 16722 | 17222 | 12655 | 12467 |
+| Words, abstract | 243 | 243 | 243 | 248 |
+| Words, Introduction | 898 | 898 | 898 | 615 |
+| Words, Related Work | 479 | 479 | 426 | 426 |
+| Words, Background | 786 | 795 | 702 | 702 |
+| Words, Methodology | 3048 | 3048 | 2031 | 2031 |
+| Words, Experimental Setup | 3871 | 3871 | 3149 | 3149 |
+| Words, Results | 4229 | 4600 | 3149 | 3141 |
+| Words, Discussion | 2826 | 2946 | 1952 | 2042 |
+| Words, Conclusion | 585 | 585 | 348 | 361 |
+| Words, CRediT authorship contribution statement | 24 | 24 | 24 | 24 |
+| Words, Funding | 18 | 18 | 18 | 18 |
+| Words, Disclaimer | 45 | 45 | 45 | 45 |
+| Words, Declaration of competing interest | 26 | 26 | 26 | 26 |
+| Words, Data availability | 54 | 54 | 54 | 54 |
+| Paragraphs, Sections 1–8 (count) | 96 | 96 | 101 | 106 |
+| Paragraphs, longest (words) | 506 | 593 | 427 | 427 |
+| Paragraph groups (subsections) | 40 | 40 | 43 | 43 |
+| Sentences > 45 words | 129 | 126 | 4 | 0 |
+| Sentences > 60 words | 49 | 46 | 3 | 0 |
+| "materiality bar" (text) | 11 | 10 | 2 | 2 |
+| "covariate-shift" (text) | 5 | 5 | 2 | 1 |
+| "not adjusted" (text) | 0 | 0 | 1 | 1 |
+| "descriptive" (text) | 8 | 8 | 2 | 2 |
+| "held-out rule" (text) | 1 | 1 | 0 | 0 |
+| "development rule" (text) | 6 | 6 | 0 | 0 |
+| "development-rule" (text) | 3 | 5 | 0 | 0 |
+| "most adversarial" (text) | 4 | 4 | 0 | 0 |
+| "materiality bar" (incl. floats) | 16 | 15 | 2 | 2 |
+| "covariate-shift" (incl. floats) | 6 | 6 | 2 | 1 |
+| "not adjusted" (incl. floats) | 2 | 2 | 4 | 4 |
+| "descriptive" (incl. floats) | 10 | 10 | 5 | 5 |
+| "held-out rule" (incl. floats) | 1 | 1 | 0 | 0 |
+| "development rule" (incl. floats) | 6 | 7 | 1 | 1 |
+| "development-rule" (incl. floats) | 5 | 7 | 0 | 0 |
+| "most adversarial" (incl. floats) | 4 | 4 | 0 | 0 |
+| Tables before \appendix | 13 | 13 | 11 | 11 |
+| Labels | 83 | 83 | 86 | 86 |
+| Duplicated labels | 0 | 0 | 0 | 0 |
+| Cite keys | 55 | 55 | 55 | 55 |
+| Numeric tokens, running_text_whole_document (distinct / total) | 307 / 805 | 321 / 842 | 313 / 714 | 313 / 708 |
+| Numeric tokens, running_text_sections_1_8 (distinct / total) | 238 / 579 | 252 / 613 | 242 / 485 | 242 / 483 |
+| Numeric tokens, all_body (distinct / total) | 798 / 2274 | 804 / 2334 | 810 / 2196 | 810 / 2190 |
+| Numeric tokens, supplement all_body (distinct) | 44 | 44 | 44 | 44 |
+| Highlights (count) | 5 | 5 | 5 | 5 |
+| Highlight lengths (characters) | 81, 83, 78, 82, 69 | 81, 83, 78, 82, 69 | 81, 83, 78, 82, 69 | 84, 83, 78, 82, 77 |
+| Keywords (count) | 7 | 7 | 7 | 7 |
+| Keywords (order) | Credit scoring; Big data; Feature selection; Large language models; Temporal validation; High-dimensional data; Selection stability | Credit scoring; Big data; Feature selection; Large language models; Temporal validation; High-dimensional data; Selection stability | Credit scoring; Big data; Feature selection; Large language models; Temporal validation; High-dimensional data; Selection stability | Big data; High-dimensional data; Credit scoring; Feature selection; Large language models; Temporal validation; Selection stability |
+| Compile: overfull_hbox | 0 | 0 | 0 | 0 |
+| Compile: underfull_hbox | 1 | 1 | 1 | 1 |
+| Compile: overfull_vbox | 0 | 0 | 0 | 0 |
+| Compile: pages | 36 | 37 | 33 | 32 |
+| Compile: undefined references / citations | 0 / 0 | 0 / 0 | 0 / 0 | 0 / 0 |
+| Compile: "Label(s) may have changed" after pass 2 | True | True | True | False |
+
 ## Derived numbers
 
 The computations use the four-decimal values printed in the baseline tables. The last column cross-checks them at full precision in the result files (R1: read only, to verify).
@@ -446,6 +650,14 @@ These were the only numeric tokens absent from the baseline after Prompt 1 (S4).
 | 0.001, 0.008 | §6.4, §6.6.1 | fold-response margins over IV then Boruta, 0.0008 to 0.0083 (Prompt 1 derived) → 0.001 to 0.008 (both tokens already in baseline) | 0.000833 → 0.001; 0.008298 → 0.008 |
 | 0.012, 0.019 | §6.4, §6.6.1 | fold-response margins over RFE CatBoost, 0.0117 to 0.0192 (Prompt 1 derived) → 0.012 to 0.019 | 0.011755 → 0.012; 0.019220 → 0.019. At three decimals the rounding discrepancy noted for 0.0117 in Prompt 1 disappears. |
 
+**Prompt 3.** No new numeric token was introduced; every number in the new abstract, Introduction, highlights and scale passages is a baseline value (see the Number trace under Prompt 3). The two counts C1 allows are stated as words:
+
+| Count | Used in | Computation |
+|---|---|---|
+| nine (target-aware selectors) | §1 | strategies whose "Labels" entry in `tab:methods` is "yes": IV/WOE, mRMR, Boruta RF, IV then Boruta, RFE CatBoost, CatBoost SHAP, LLM then mRMR, LLM then Boruta and Stable core + LLM fill = 9 |
+| six (refits per selector and case) | §1 | 5 development folds + 1 full-DEV refit = 6. This matches Appendix F, where the three Boruta-based selectors have 108 = 3 × 6 cases × 6 fold and full-DEV refits |
+| 1.5 million | §1 (already in the baseline Introduction) | 1,526,659 decisions rounded |
+
 ## Unresolved
 
 None in Prompt 1. The abstract and Introduction mentions of the timing measurement are deferred to Prompt 3 by instruction (A6), not unresolved.
@@ -455,6 +667,10 @@ None in Prompt 1. The abstract and Introduction mentions of the timing measureme
   - In the text, captions and notes of Sections 2–8, which the prompt allows me to edit, all four banned phrases count 0, so P3 is marked PASS on that scope.
   - If P3 is read as covering table cells too, this one cell is the only miss. The fix is a one-word change to that cell ("development rule" → "DEV rule"), which needs the authors' approval under R3.
   - Two more table cells keep the older wording but fall outside P3's phrase list: "Held-out-rule margins in five cases" in `tab:robustness` (a baseline cell) and "development-rule comparison" in `tab:stages` (appendix). R3 protects both.
+
+**Prompt 3.**
+- **Same table-cell residual, now under F5.** F5 counts the four banned phrases over the abstract and Sections 1–8. In text, captions and notes they are 0, so F5 is marked PASS on that scope. Counting table cells, "development rule" is 1: the same protected `tab:robustness` cell as in Prompt 2. The fix needs the authors' approval under R3.
+- Nothing else is unresolved.
 
 ## Author decisions
 
@@ -505,3 +721,35 @@ None in Prompt 1. The abstract and Introduction mentions of the timing measureme
 23. **Wording fix in §5.6.** "responses of the language model, of which there is one per case, ten on Stability 2024" became "one language-model response per case in the headline tables". The old wording ignored the five per-fold responses of Home Credit and LendingClub reported in §6.6.1 (Prompt 1 observation).
 24. **Method of the rewrite.** A scratchpad script (not part of the repository) assembled Sections 2–8 from new text templates. Floats and equations were taken verbatim from the Prompt 1 commit, and only captions and the listed note sentences were replaced; the script checked that each AI-assistance sentence survives in its caption. This is why S3 and S5 hold by construction and are also verified by `tools/check_p2.py`.
 25. **PDFs and zip, again not rebuilt.** As in Prompt 1, `submission/manuscript.pdf` and the zip are left for the rebuild after Prompt 3. The Prompt 2 build is in the scratchpad (33 pages).
+
+**Prompt 3.**
+
+26. **F1 span.** F1 uses the Prompt 1 definition of Sections 1–8: `\section{Introduction}` to `\appendix`, including the unchanged back matter. The span is 16,889 → 12,634 words (−25.2%); counting numbered sections only it is 16,722 → 12,467 (−25.4%), and the Introduction is 898 → 615 (−31.5%).
+    - The margin over 25% is small because C4 and C5 added about 110 words.
+    - Keeping it meant removing the Introduction's research-gap sentence and long roadmap, and trimming repeats in §6.7, §7.5 and §7.7, all within the Prompt 3 scope.
+27. **Title alternatives (C7).** The title is unchanged; three shorter alternatives that put scale first:
+    - "Row-Independent LLM Pre-Screening of Large Credit Feature Universes: A Frozen Held-Out Evaluation"
+    - "Screening Thousands of Credit Features Without Reading a Row: Language-Model Pre-Screening on 1.5 Million Decisions"
+    - "Semantic Pre-Screening at Scale for Credit Scoring: Cost Structure and Held-Out Evidence"
+28. **The timing measurement left the abstract (B9).** B9 made it optional, and dropping it:
+    - keeps the abstract under 250 words;
+    - states the cost claim at design level, which is what the evidence supports.
+
+    The measurement stays in the Introduction and §6.7, each with "unscreened 1,959-feature universe" (F6).
+29. **"Mixed rule" is named but not defined in the abstract**, for lack of words; §5.6 defines it. The two other rules are described in plain words ("chosen on held-out results", "on development folds").
+30. **Qualified test claim.** The abstract says "no hypothesis test is reported for these comparisons" rather than "no hypothesis test is reported", because the pre-declared voting family does carry one.
+31. **Highlight 1 corrected.** The baseline highlight said the LLM pre-screens "a 1,959-feature credit universe". On Stability 2024 the LLM ranks the 1,068 screened candidates, and the 1,959-feature universe is the pre-screening pool, so the highlight now says "up to 1,068 candidate credit features". The abstract and contribution 1 still give 1,959 as the size of the portfolios' universes, which is correct.
+32. **Placement of C4 and C5.** C4 went into §7.5 (interpretation) rather than §6.7, which reports measurements only (Prompt 2, B5). C5 is a separate paragraph of §7.7, placed before the voting and scope paragraph.
+33. **Submission folder rebuilt.** This is the rebuild deferred in Prompts 1 and 2, done because `submission/` is meant to stay submission-ready:
+    - `submission/manuscript.pdf` is the final compile, identical to `revised.pdf`;
+    - `submission/highlights.txt` holds the five new highlights;
+    - `submission/manuscript_source.zip` was rebuilt with the same five files (manuscript.tex, manuscript.pdf, supplementary.tex, supplementary.pdf, highlights.txt);
+    - `supplementary.tex` and `supplementary.pdf` are unchanged.
+34. **Items that still need the authors, carried from Prompts 1 and 2:**
+    - the protected `tab:robustness` cell wording (Unresolved);
+    - the mixed-rule interval in `priority_2/conservative_pair_interval.csv`, which contradicts "interval not computed" (decision 22);
+    - the "None of them" antecedent in §5.1 (decision 21);
+    - Appendix F's pointer for LLM then Boruta, and its introduction, which does not mention Tables F.4 and F.5 (decision 19);
+    - the proposed further table moves (decision 18);
+    - 0.0117, kept as derived from printed values (decision 4; it now appears only in a table cell and a note, the text using 0.012);
+    - A5 (decision 8): resolved with file evidence in Prompt 1, with no number changed. The capped mRMR run is 0.745693 in `priority_2/diversity_capped_ho_auc.csv`, and the superseded RF/correlation value is 0.745689 in `archive/manuscript_v1_long.tex:1650`, two different runs that round to the same 0.7457.

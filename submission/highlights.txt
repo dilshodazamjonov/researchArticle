@@ -1,5 +1,5 @@
-An LLM pre-screens a 1,959-feature credit universe from definitions, no data rows
+An LLM ranks up to 1,068 candidate credit features from definitions, reading no rows
 The semantic stage's cost depends on the variable book, not the number of decisions
 LLM-assisted leaders win 5 of 6 held-out cases under three leader-choice rules
 LLM-assisted subsets lose less AUC from development to holdout than classical ones
-Home Credit logistic regression still favours mutual-information mRMR
+Home Credit logistic regression favours the classical leader under every rule
