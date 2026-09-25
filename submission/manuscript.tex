@@ -100,10 +100,10 @@
 
 % ------------------------------------------------------------
 % HIGHLIGHTS (upload as a separate file at submission; 85 characters max each)
-%  - Semantic pre-screening is a usable, dataset-dependent filter for credit scoring
-%  - An LLM screens a 1,959-feature credit universe from definitions, with no data rows
-%  - LLM leaders win 5 of 6 held-out cases under all rules and lose less AUC to holdout
-%  - Paired AUC gains of +0.012 to +0.051 (holdout rule), +0.013 to +0.052 (development)
+%  - An LLM pre-screens a 1,959-feature credit universe from definitions, no data rows
+%  - The semantic stage's cost depends on the variable book, not the number of decisions
+%  - LLM-assisted leaders win 5 of 6 held-out cases under three leader-choice rules
+%  - LLM-assisted subsets lose less AUC from development to holdout than classical ones
 %  - Home Credit logistic regression still favours mutual-information mRMR
 % ------------------------------------------------------------
 
@@ -132,7 +132,7 @@ Engineered credit-scoring universes hold hundreds or thousands of predictors, fr
 
 % BDR cap: 7 keywords (now 7). Do not add.
 \begin{keyword}
-Credit scoring \sep Big data \sep Feature selection \sep Large language models \sep Temporal validation \sep Covariate shift \sep Selection stability
+Credit scoring \sep Big data \sep Feature selection \sep Large language models \sep Temporal validation \sep High-dimensional data \sep Selection stability
 \end{keyword}
 
 \end{frontmatter}
