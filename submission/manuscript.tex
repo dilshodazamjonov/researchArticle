@@ -16,6 +16,7 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{array}
+\usepackage{etoolbox}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \setlength{\emergencystretch}{1.5em}
 \raggedbottom % let columns end short on float pages instead of stretching inter-paragraph space
@@ -26,13 +27,22 @@
 \renewcommand{\floatpagefraction}{0.75}
 \setcounter{topnumber}{3}
 \setcounter{totalnumber}{4}
-% Double-column floats: same thresholds as single-column ones, so a half-page table goes to the top of a page
-% with text below it instead of being centred alone on a float page; any float page is top-aligned.
+% Double-column floats: a float-only page is built only when its floats fill 90% of it (otherwise they go to the
+% top of a text page with text below), up to three per page; any float page is top-aligned, with fixed gaps
+% between its floats so leftover space collects at the foot instead of opening a gap between two tables.
 \renewcommand{\dbltopfraction}{0.9}
-\renewcommand{\dblfloatpagefraction}{0.75}
+\renewcommand{\dblfloatpagefraction}{0.9}
+\setcounter{dbltopnumber}{3}
 \makeatletter
 \setlength{\@fptop}{0pt}
 \setlength{\@dblfptop}{0pt}
+\setlength{\@fpsep}{\floatsep}
+\setlength{\@dblfpsep}{\dblfloatsep}
+% Kernel quirk in two-column mode: when \clearpage moves double-column floats planned for the top of a new page onto
+% float pages, it restores the page height but not the first column's text height, so the next page's left column
+% stops after a few lines. Restore the full height there.
+\patchcmd{\@doclearpage}{\global \@colht \textheight}{\global \@colht \textheight \global \@colroom \textheight}{}%
+  {\PackageWarningNoLine{manuscript}{Patch of \string\@doclearpage\space failed}}
 \makeatother
 \usepackage{threeparttable}
 \usepackage{tikz}
