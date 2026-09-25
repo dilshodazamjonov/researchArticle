@@ -1028,12 +1028,49 @@ Stability 2024, CatBoost & Pure LLM & 40 & 0.8791 & 0.8784 & $+0.0007$ $[-0.0005
 \end{threeparttable}
 \end{table*}
 
-\subsection{Cost and Runtime of the Pre-Screening Stage}
+\subsection{Scalability and cost}
 \label{subsec:cost_runtime}
 
-On Home Credit and LendingClub, 72 logical screening requests were served by 30 provider ranking calls, 6 on Home Credit and 24 on LendingClub, the remainder being cache hits. The 30 calls consumed 806,757 input and 56,495 output tokens, for a direct API cost between USD~0.171 and USD~0.413 at the GPT-4.1 mini list prices of USD~0.40 per million input tokens, 0.10 per million cached input tokens and 1.60 per million output tokens; the bounds correspond to all input charged at the cached rate and at the uncached rate. The Stability 2024 ranking call is not included, because its token usage was not recorded. Wall-clock times were not measured under matched conditions, with the one exception noted at the end of this section, and support no scalability claim. On Home Credit logistic regression the pure LLM pipeline took 0.8 minutes against 12.1 minutes for full-pool mRMR (RF/correlation implementation) and 24.6 minutes for stable core plus LLM fill. On LendingClub CatBoost pure LLM was slower than mRMR: domain rules took 49.7 minutes, mRMR 65.3, LLM then mRMR 72.8, pure LLM 73.8, PCA 88.0, LLM then Boruta 110.5, Boruta 172.6 and stable core plus LLM fill 256.0 minutes, of which 176.6 minutes were feature selection; measured against the 49.7 minutes of the essentially selection-free domain-rules pipeline, it is the selection stage rather than model fitting that separates the pipelines, and the semantic call is negligible beside both. The saved runs of the final protocol were executed on the CPU of one machine with 16 logical (10 physical) cores and 39.6~GiB of RAM, with four estimator threads and no accelerator; peak process memory was 7.4 to 10.7~GB for the Home Credit selectors and full-feature references, 19.1 to 29.0~GB for their LendingClub counterparts and 27.0 to 29.0~GB for their Stability 2024 counterparts. Runtimes were measured under unequal caching and execution conditions and are quoted above for Home Credit and LendingClub only. One downstream saving from a reduced candidate pool was measured under matched conditions: on Stability 2024 fold 1, on the same machine, the mRMR stage took 522 seconds over the 1,959-feature universe and 21 seconds over a 100-feature pool, a factor of 25 for a pool twenty times smaller.
+One downstream saving from a reduced candidate pool was measured under matched conditions: on Stability 2024 fold 1, on the same machine, the mRMR stage took 522 seconds over the 1,959-feature universe and 21 seconds over a 100-feature pool, a factor of 25 for a pool twenty times smaller. This is the one runtime measurement of the study made under matched conditions and the only one on which a statement about scale rests. A pool of that size is what the semantic stage hands to the statistical stage of LLM then mRMR under CatBoost (Section~\ref{subsec:hybrid_fs}), and that stage reads the variable book and no data rows, so its own cost depends on the number of candidate records and not on the number of decisions.
 
+Table~\ref{tab:cost_structure} sets out what each stage of the pipeline reads, how often it is recomputed and what its cost grows with, as these follow from the method definitions of Sections~\ref{subsec:classical_fs}, \ref{subsec:llm_fs} and \ref{subsec:hybrid_fs}; the table describes the design and is not a measurement. The semantic ranking is the only stage whose input is the variable book rather than the data rows: it was requested once per partition on Home Credit and LendingClub and once on Stability 2024, and the cached response served every later refit. Every other selection stage, and every model fit, is recomputed in every fold and again in the full-DEV refit, over all the rows of its partition.
 
+\begin{table*}[htbp]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\begin{threeparttable}
+\caption{Cost structure of the pipeline stages, as it follows from the method definitions of Sections~\ref{subsec:classical_fs}, \ref{subsec:llm_fs} and \ref{subsec:hybrid_fs}; a description of the design, not a measurement. ``Recomputed'' states how often the stage runs in the protocol; ``Cost grows with'' names the quantities its work scales with. IV then Boruta, LLM then mRMR and LLM then Boruta combine the rows of their two stages, the second running over the pool the first leaves.}
+\label{tab:cost_structure}
+\begin{tabular}{@{}L{27mm}L{42mm}L{40mm}L{\dimexpr\textwidth-109mm-6\tabcolsep\relax}@{}}
+\toprule
+Stage & Reads & Recomputed & Cost grows with \\
+\midrule
+Semantic ranking (LLM) & Variable book, one record per candidate; no data rows & Once per partition on Home Credit (per partition and budget on LendingClub); once on Stability 2024; cached thereafter & Number of candidate records; not the number of decisions \\
+\addlinespace
+Missingness screen & Feature values of the earliest training partition & Once per dataset & Rows $\times$ candidates \\
+\addlinespace
+IV/WOE & Feature values and labels & Every fold and the full-DEV refit & Rows $\times$ candidates \\
+\addlinespace
+mRMR & Feature values and labels & Every fold and the full-DEV refit & One relevance estimate per candidate and up to $\Kfeat$ redundancy estimates per candidate, each over all rows \\
+\addlinespace
+Boruta RF & Feature values, one shuffled shadow copy per feature, and labels & Every fold and the full-DEV refit & Random-forest fits over all rows and twice the number of candidates, repeated for the confirmation test \\
+\addlinespace
+RFE CatBoost & Feature values and labels & Every fold and the full-DEV refit & Repeated boosted fits over all rows as the pool shrinks by 20\% per step \\
+\addlinespace
+CatBoost SHAP & Feature values and labels & Every fold and the full-DEV refit & One boosted fit, plus SHAP values over a 10,000-row sample \\
+\addlinespace
+Stable core + LLM fill & Feature values and labels, plus the semantic ranking & Every fold and the full-DEV refit & Five bootstrap runs of the RF/correlation filter \\
+\addlinespace
+Model fitting & The selected subset & Every fold and the full-DEV refit & Rows $\times$ selected columns \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table*}
+
+On Home Credit and LendingClub, 72 logical screening requests were served by 30 provider ranking calls, 6 on Home Credit and 24 on LendingClub, the remainder being cache hits. The 30 calls consumed 806,757 input and 56,495 output tokens, for a direct API cost between USD~0.171 and USD~0.413 at the GPT-4.1 mini list prices of USD~0.40 per million input tokens, 0.10 per million cached input tokens and 1.60 per million output tokens; the bounds correspond to all input charged at the cached rate and at the uncached rate. The Stability 2024 ranking call is not included, because its token usage was not recorded.
+
+The saved runs of the final protocol were executed on the CPU of one machine with 16 logical (10 physical) cores and 39.6~GiB of RAM, with four estimator threads and no accelerator; peak process memory was 7.4 to 10.7~GB for the Home Credit selectors and full-feature references, 19.1 to 29.0~GB for their LendingClub counterparts and 27.0 to 29.0~GB for their Stability 2024 counterparts. Wall-clock times of the pipelines were measured under unequal caching and execution conditions and support no scalability claim; they are reported for Home Credit and LendingClub in \ref{app:robustness}.
 
 % ============================================================
 % 7. DISCUSSION
@@ -1568,6 +1605,15 @@ Rank & CatBoost: Pure LLM (LLM-assisted) & CatBoost: CatBoost SHAP (classical) \
 \end{tabular}
 \end{threeparttable}
 \end{table*}
+
+\section{Robustness checks in detail}
+\label{app:robustness}
+\setcounter{table}{0}\setcounter{figure}{0}
+
+This appendix holds the unmatched wall-clock times referred to in Section~\ref{subsec:cost_runtime}.
+
+\paragraph{Unmatched wall-clock times}
+Wall-clock times were not measured under matched conditions, with the one exception reported in Section~\ref{subsec:cost_runtime}, and support no scalability claim. On Home Credit logistic regression the pure LLM pipeline took 0.8 minutes against 12.1 minutes for full-pool mRMR (RF/correlation implementation) and 24.6 minutes for stable core plus LLM fill. On LendingClub CatBoost pure LLM was slower than mRMR: domain rules took 49.7 minutes, mRMR 65.3, LLM then mRMR 72.8, pure LLM 73.8, PCA 88.0, LLM then Boruta 110.5, Boruta 172.6 and stable core plus LLM fill 256.0 minutes, of which 176.6 minutes were feature selection; measured against the 49.7 minutes of the essentially selection-free domain-rules pipeline, it is the selection stage rather than model fitting that separates the pipelines, and the semantic call is negligible beside both. Runtimes were measured under unequal caching and execution conditions and are quoted here for Home Credit and LendingClub only.
 
 \clearpage
 
