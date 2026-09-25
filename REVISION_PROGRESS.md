@@ -1,54 +1,61 @@
 # REVISION_PROGRESS.md
 
-Progress file for the text-only revision run (prompt: `prompt.md`). Updated after every task so that an interrupted run can resume.
+Progress file for the text-only revision run (prompt: `prompt.md`), completed 2026-09-25. All tasks are done except F7 (skipped, reason below); an interrupted rerun would find every task committed on branch `revision/presentation-and-fit`.
 
-## Locations decided at the start of the run
+## Locations
 
-- **Manuscript revised:** `submission/manuscript.tex` (the newest copy; it carries the layout fixes committed as the baseline and the `headline_subsets.csv` sentence that the prompt's task W7 refers to). The root `manuscript.tex` is an older duplicate and is left untouched.
-- **Git:** branch `revision/presentation-and-fit` created from `main`; the pre-existing uncommitted layout changes to `submission/manuscript.tex`, `.pdf` and `manuscript_source.zip` were committed unmodified as the first commit ("Baseline") so that every later commit is one task ID.
-- **Deliverables:** LaTeX deliverables (revised manuscript, PDF, `supplementary.tex`, `highlights.txt`, `revision_baseline.pdf/.log`, latexdiff) in `submission/`; Markdown deliverables (`REVISION_PROGRESS.md`, `REVISION_CHANGELOG.md`, `number_inventory_report.md`, `qa_report.md`) in the repository root next to `prompt.md`.
-- **Scripts** (number inventory, checks) live in the session scratchpad and are reproduced in `qa_report.md` where their output is reported.
+- **Manuscript revised:** `submission/manuscript.tex` (the newest copy, with the layout fixes committed as the baseline and the `headline_subsets.csv` sentence that task W7 refers to). The root `manuscript.tex` is an older duplicate, left untouched.
+- **Git:** branch `revision/presentation-and-fit` from `main`; first commit = pre-existing uncommitted changes, unmodified; then one commit per task ID (list in `REVISION_CHANGELOG.md`, section 8). Nothing pushed.
+- **Deliverables:** `submission/manuscript.tex` + `.pdf`, `submission/supplementary.tex` + `.pdf`, `submission/highlights.txt`, `submission/revision_baseline.pdf` + `.log`, `submission/manuscript_diff.tex` + `.pdf` (latexdiff); `REVISION_CHANGELOG.md`, `number_inventory_report.md`, `qa_report.md`, `REVISION_PROGRESS.md` in the repository root.
 
 ## Task status
 
 | Task | Status | Notes |
 |---|---|---|
-| 2.1 Locate everything | done | see CSV inventory below |
-| 2.2 Baseline | done | pdflatex available; 3 passes; 35 pages; no overfull boxes; only hyperref duplicate-destination warnings (from the appendix table-counter resets) |
-| 2.3 Number inventory | done | 1,732 numeric tokens (855 distinct) in the body of the original `.tex`, saved with line numbers |
-| F1 Title | pending | |
-| F2 Introduction scale paragraph, contribution, related work | pending | |
-| F3 Keywords and highlights | pending | |
-| F4 Scale figure | pending | |
-| F5 Scalability and cost | pending | no CSV records token usage, so no per-call token figures will be added |
-| F6 Deployment at scale | pending | |
-| F7 Big Data Research citations | pending | web access to be tested |
-| F8 AI declaration | pending | |
-| W1–W12 | pending | |
-| 5.x Verification | pending | |
-| 6 Deliverables | pending | |
+| 2.1 Locate everything | done | CSV inventory below |
+| 2.2 Baseline | done | 3 pdflatex passes; 35 pages; no overfull boxes; only hyperref duplicate-destination warnings |
+| 2.3 Number inventory | done | 1,732 tokens, 855 distinct |
+| F1 Title | done | `\title` and `pdftitle` |
+| F2 Introduction scale paragraph, contribution, Related Work | done | |
+| F3 Keywords and highlights | done | `submission/highlights.txt`; lengths 81/83/78/82/69 |
+| F4 Scale figure | done | `fig:scale` after `tab:datasets` |
+| F5 Scalability and cost | done | `tab:cost_structure`; runtimes moved to `app:robustness`; no per-call tokens (no CSV has them) |
+| F6 Deployment at scale | done | 198 words |
+| F7 Big Data Research citations | **skipped** | Crossref metadata reachable; publisher pages return HTTP 403 and no browser is installed, so abstracts could not be read on the publisher's page; candidates listed in the changelog for the authors |
+| F8 AI declaration | done | authors must affirm it |
+| W1 Caveats once | done | |
+| W2 Protocol history to appendix | done | `app:protocol`; provenances to `subsec:llm_fs` |
+| W3 Robustness table and appendix | done | `subsec:robustness`, `tab:robustness`, `app:robustness` |
+| W4 Numbers in tables | done | new `tab:response_lists`; extended `tab:response_spread` |
+| W5 Results restructured | done | 6.1–6.5 |
+| W6 Paragraph length | done | |
+| W7 Supplementary | done | `submission/supplementary.tex` (Tables S1–S6) |
+| W8 Abstract | done | 243 words |
+| W9 One meaning per term | done | |
+| W10 Word counts | reported | targets not reached (rule 1.5); figures in `qa_report.md` |
+| W11 Captions | done | |
+| W12 Appendix order | done | E and F after A–D |
+| 5.1–5.10 Verification | done | `qa_report.md` |
+| 6 Deliverables | done | see Locations |
 
 ## 2.2 Baseline build
 
-- `pdflatex` 3 passes on the unmodified manuscript (embedded bibliography, no BibTeX): `submission/revision_baseline.pdf` (35 pages), `submission/revision_baseline.log`.
-- Warnings in the baseline log: 15 "pdfTeX warning (ext4): destination with the same identifier (name{table.N} / figure.1)" (caused by `\setcounter{table}{0}` in the appendices; pre-existing), no undefined references, no overfull or underfull boxes reported.
+- `submission/revision_baseline.pdf` (35 pages), `submission/revision_baseline.log`; warnings: 15 pdfTeX "destination with the same identifier" messages from the appendix table-counter resets; no undefined references; no overfull or underfull boxes.
 
-## 2.2 Word counts before (texcount, "Words in text": excludes headers, captions, tabular cells and TikZ text)
+## 2.2 Word counts (texcount "Words in text")
 
-| Section | Words in text |
-|---|---|
-| 1 Introduction | 709 |
-| 2 Related Work | 468 |
-| 3 Background | 752 |
-| 4 Methodology | 3,521 |
-| 5 Experimental Setup | 3,797 |
-| 6 Results | 5,289 |
-| 7 Discussion | 2,636 |
-| 8 Conclusion | 576 |
-| Sections 1–8 total | 17,748 |
-| Sections 6+7 | 7,925 |
-
-Command: `texcount -sub=section -sum -nocol -q submission/manuscript.tex` (texcount was verified on a test file to leave tabular cells, TikZ node text and captions out of "Words in text").
+| Section | Before | After |
+|---|---|---|
+| 1 Introduction | 709 | 887 |
+| 2 Related Work | 468 | 476 |
+| 3 Background | 752 | 752 |
+| 4 Methodology | 3,521 | 3,011 |
+| 5 Experimental Setup | 3,797 | 3,830 |
+| 6 Results | 5,289 | 4,099 |
+| 7 Discussion | 2,636 | 2,775 |
+| 8 Conclusion | 576 | 579 |
+| Sections 1–8 | 17,748 | 16,409 |
+| Sections 6+7 | 7,925 | 6,874 |
 
 ## 2.1 CSV inventory (none is modified by this run)
 
