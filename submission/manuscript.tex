@@ -42,7 +42,7 @@
 % float pages, it restores the page height but not the first column's text height, so the next page's left column
 % stops after a few lines. Restore the full height there.
 \patchcmd{\@doclearpage}{\global \@colht \textheight}{\global \@colht \textheight \global \@colroom \textheight}{}%
-  {\PackageWarningNoLine{manuscript}{Patch of \string\@doclearpage\space failed}}
+ {\PackageWarningNoLine{manuscript}{Patch of \string\@doclearpage\space failed}}
 \makeatother
 \usepackage{threeparttable}
 \usepackage{tikz}
@@ -77,16 +77,16 @@
 \definecolor{cRed}{HTML}{D55E00}
 \definecolor{cGrey}{HTML}{8C8C8C}
 \pgfplotsset{
-  paper/.style={
-    axis line style={gray!60},
-    tick style={gray!60},
-    tick label style={font=\footnotesize},
-    label style={font=\footnotesize},
-    title style={font=\footnotesize\bfseries},
-    grid style={gray!18},
-    legend style={font=\footnotesize, draw=none, fill=none},
-    scaled ticks=false,
-  }
+ paper/.style={
+  axis line style={gray!60},
+  tick style={gray!60},
+  tick label style={font=\footnotesize},
+  label style={font=\footnotesize},
+  title style={font=\footnotesize\bfseries},
+  grid style={gray!18},
+  legend style={font=\footnotesize, draw=none, fill=none},
+  scaled ticks=false,
+ }
 }
 
 \newcommand{\Kfeat}{K}
@@ -100,11 +100,11 @@
 
 % ------------------------------------------------------------
 % HIGHLIGHTS (upload as a separate file at submission; 85 characters max each)
-%  - An LLM pre-screens a 1,959-feature credit universe from definitions, no data rows
-%  - The semantic stage's cost depends on the variable book, not the number of decisions
-%  - LLM-assisted leaders win 5 of 6 held-out cases under three leader-choice rules
-%  - LLM-assisted subsets lose less AUC from development to holdout than classical ones
-%  - Home Credit logistic regression still favours mutual-information mRMR
+% - An LLM pre-screens a 1,959-feature credit universe from definitions, no data rows
+% - The semantic stage's cost depends on the variable book, not the number of decisions
+% - LLM-assisted leaders win 5 of 6 held-out cases under three leader-choice rules
+% - LLM-assisted subsets lose less AUC from development to holdout than classical ones
+% - Home Credit logistic regression still favours mutual-information mRMR
 % ------------------------------------------------------------
 
 \begin{document}
@@ -192,14 +192,14 @@ A retail credit model estimates the probability of a defined adverse event withi
 
 Let $X_1,\dots,X_d$ denote candidate features and $Y\in\{0,1\}$ the event indicator. \emph{Filters} score features by statistics computed from data alone. The information value (IV) of scorecard practice bins a feature and compares the shares $g_b$ and $e_b$ of non-events and events in bin $b$ through the weight of evidence (WOE) \cite{siddiqi2006},
 \begin{equation}
-    \mathrm{WOE}_b=\ln\frac{g_b}{e_b},\qquad
-    \mathrm{IV}=\sum_{b}(g_b-e_b)\,\mathrm{WOE}_b .
-    \label{eq:iv}
+  \mathrm{WOE}_b=\ln\frac{g_b}{e_b},\qquad
+  \mathrm{IV}=\sum_{b}(g_b-e_b)\,\mathrm{WOE}_b .
+  \label{eq:iv}
 \end{equation}
 Mutual information $I(X_j;Y)$ is the general-purpose relevance statistic, and mRMR \cite{peng2005} adds greedily the feature that maximises relevance minus its average redundancy with the already selected set $S$,
 \begin{equation}
-    j^{\star}=\arg\max_{j\notin S}\Big[\,I(X_j;Y)-\frac{1}{|S|}\sum_{k\in S} I(X_j;X_k)\Big],
-    \label{eq:mrmr}
+  j^{\star}=\arg\max_{j\notin S}\Big[\,I(X_j;Y)-\frac{1}{|S|}\sum_{k\in S} I(X_j;X_k)\Big],
+  \label{eq:mrmr}
 \end{equation}
 with mutual information estimated by nearest-neighbour estimators \cite{kraskov2004,ross2014}: the estimator of Kraskov et al.\ between continuous variables and that of Ross between a continuous feature and the binary target. Principal component analysis is unsupervised but replaces variables by orthogonal combinations rather than selecting them \cite{jolliffe2016}. \emph{Wrappers} evaluate subsets with a learning algorithm, here recursive feature elimination \cite{guyon2002} and Boruta \cite{kursa2010,breiman2001}, and \emph{embedded} methods derive relevance from the fitted model, here through SHAP attributions \cite{lundberg2017}, with sparsity penalties \cite{tibshirani1996} the classical alternative; their implementations are specified in Section~\ref{subsec:classical_fs}. Because wrappers and embedded methods use the target, they must be fitted strictly inside development folds.
 
@@ -225,26 +225,26 @@ Selection stability is the degree to which a selector returns the same subset wh
 
 Figure~\ref{fig:pipeline} summarises the pipeline, which is executed in the same order for every dataset.
 \begin{enumerate}
-    \item \textbf{Assembly and outcome definition.} The engineered universe is assembled (529 predictors for Home Credit, 675 for LendingClub, 1,959 for Stability 2024) and the event definition of Section~\ref{subsec:datasets} applied; for Stability 2024 a prediction-time availability review of 461 source variables approved 434 raw predictors, and on LendingClub the same kind of review removed every post-origination field and the platform's own pricing and grading fields before the 675 features were built from roughly 93 source columns (Section~\ref{subsec:datasets}).
-    \item \textbf{Split and folds.} Each dataset is split along its ordering index, calendar time for LendingClub and Stability 2024 and prior-application recency for Home Credit, into a development population (DEV) and a held-out population (HO), and DEV is divided into five expanding-window folds along the same index, with one index unit omitted between training and validation partitions (same-date decisions stay together in Stability 2024).
-    \item \textbf{Candidate universe and preprocessing.} Every selector, classical and LLM-assisted, works from the same candidate set: the features of the engineered universe with at most 90\% missing values on the training partition of the earliest fold, a screen computed once per dataset, held fixed across the folds and using no outcomes. It retains 373 of the 529 Home Credit features, all 675 LendingClub features, none of which exceeds the threshold, and 1,068 of the 1,959 Stability 2024 features. The information-value interval of $0.01\le\mathrm{IV}\le0.50$ is used within the IV/WOE ranker and as the screening stage of IV then Boruta; the upper bound, the conventional leakage warning of scorecard practice, removed nothing, because no feature of any of the three universes reaches an information value of 0.50 on the earliest training partition. Preprocessing maps are fitted on the training partition of each fold.
-    \item \textbf{Feature selection.} The thirteen strategies of Sections~\ref{subsec:classical_fs}--\ref{subsec:hybrid_fs} (Table~\ref{tab:methods}), and the classical voting family of \ref{app:voting}, produce a subset of $\Kfeat=20$ (logistic regression) or $\Kfeat=40$ (CatBoost) original features; target-free rankings use no outcome; the semantic ranking is requested separately for each fold partition on Home Credit and LendingClub, and one ranking served every fold on Stability 2024 (Section~\ref{subsec:llm_fs}); target-aware selectors are fitted per fold.
-    \item \textbf{Model fitting and validation.} The fixed configurations of Section~\ref{subsec:models} are fitted on the subset; fold validation yields discrimination estimates and the five fold-level subsets used for stability.
-    \item \textbf{Freeze and HO scoring.} Everything is refitted on full DEV; rankings, subsets and settings are recorded in a hash-bound manifest; the frozen pipeline then scores the HO population, and no retuning of that pipeline follows within the protocol version (changes between versions are summarised in Section~\ref{subsec:protocol_development} and recorded in \ref{app:protocol}, Table~\ref{tab:stages}).
+  \item \textbf{Assembly and outcome definition.} The engineered universe is assembled (529 predictors for Home Credit, 675 for LendingClub, 1,959 for Stability 2024) and the event definition of Section~\ref{subsec:datasets} applied; for Stability 2024 a prediction-time availability review of 461 source variables approved 434 raw predictors, and on LendingClub the same kind of review removed every post-origination field and the platform's own pricing and grading fields before the 675 features were built from roughly 93 source columns (Section~\ref{subsec:datasets}).
+  \item \textbf{Split and folds.} Each dataset is split along its ordering index, calendar time for LendingClub and Stability 2024 and prior-application recency for Home Credit, into a development population (DEV) and a held-out population (HO), and DEV is divided into five expanding-window folds along the same index, with one index unit omitted between training and validation partitions (same-date decisions stay together in Stability 2024).
+  \item \textbf{Candidate universe and preprocessing.} Every selector, classical and LLM-assisted, works from the same candidate set: the features of the engineered universe with at most 90\% missing values on the training partition of the earliest fold, a screen computed once per dataset, held fixed across the folds and using no outcomes. It retains 373 of the 529 Home Credit features, all 675 LendingClub features, none of which exceeds the threshold, and 1,068 of the 1,959 Stability 2024 features. The information-value interval of $0.01\le\mathrm{IV}\le0.50$ is used within the IV/WOE ranker and as the screening stage of IV then Boruta; the upper bound, the conventional leakage warning of scorecard practice, removed nothing, because no feature of any of the three universes reaches an information value of 0.50 on the earliest training partition. Preprocessing maps are fitted on the training partition of each fold.
+  \item \textbf{Feature selection.} The thirteen strategies of Sections~\ref{subsec:classical_fs}--\ref{subsec:hybrid_fs} (Table~\ref{tab:methods}), and the classical voting family of \ref{app:voting}, produce a subset of $\Kfeat=20$ (logistic regression) or $\Kfeat=40$ (CatBoost) original features; target-free rankings use no outcome; the semantic ranking is requested separately for each fold partition on Home Credit and LendingClub, and one ranking served every fold on Stability 2024 (Section~\ref{subsec:llm_fs}); target-aware selectors are fitted per fold.
+  \item \textbf{Model fitting and validation.} The fixed configurations of Section~\ref{subsec:models} are fitted on the subset; fold validation yields discrimination estimates and the five fold-level subsets used for stability.
+  \item \textbf{Freeze and HO scoring.} Everything is refitted on full DEV; rankings, subsets and settings are recorded in a hash-bound manifest; the frozen pipeline then scores the HO population, and no retuning of that pipeline follows within the protocol version (changes between versions are summarised in Section~\ref{subsec:protocol_development} and recorded in \ref{app:protocol}, Table~\ref{tab:stages}).
 \end{enumerate}
 The LLM ranking is target-free: the model receives feature definitions and lineage only, and no outcomes, validation statistics or HO information; domain rules, Random~$\Kfeat$, principal components and the missingness screen that defines the candidate set are also target-free. Information value, mRMR, Boruta, recursive elimination, SHAP ranking, the stable-core construction and model fitting are target-aware and confined to DEV training partitions. Leakage controls thus operate at three levels: HO exclusion from every fitting, selection and ranking step, fold-local fitting of every target-aware component, and hash-bound freezing of every artefact before each final HO scoring run.
 
 \begin{figure*}[htbp]
 \centering
 \begin{tikzpicture}[
-    font=\scriptsize,
-    box/.style={draw=gray!60, rounded corners=2pt, align=flush center, inner sep=3pt, minimum height=8mm, fill=white},
-    tfree/.style={box, fill=gray!14},
-    taware/.style={box, fill=cBlue!12, draw=cBlue!60!black},
-    oot/.style={box, fill=cOrange!25, draw=cOrange!80!black},
-    arr/.style={-{Latex[length=1.8mm]}, semithick, gray!50!black},
-    darr/.style={-{Latex[length=1.8mm]}, semithick, dashed, cOrange!80!black},
-    node distance=5mm and 4mm
+  font=\scriptsize,
+  box/.style={draw=gray!60, rounded corners=2pt, align=flush center, inner sep=3pt, minimum height=8mm, fill=white},
+  tfree/.style={box, fill=gray!14},
+  taware/.style={box, fill=cBlue!12, draw=cBlue!60!black},
+  oot/.style={box, fill=cOrange!25, draw=cOrange!80!black},
+  arr/.style={-{Latex[length=1.8mm]}, semithick, gray!50!black},
+  darr/.style={-{Latex[length=1.8mm]}, semithick, dashed, cOrange!80!black},
+  node distance=5mm and 4mm
 ]
 \node[box, text width=44mm] (data) {Engineered feature universe\\and outcome definition};
 \node[box, text width=44mm, right=of data] (split) {Split by ordering index\\(calendar time; for Home Credit,\\prior-application recency)\\DEV, then HO population};
@@ -401,22 +401,22 @@ Candidate set, all selectors & 373 of 529 ($\le$90\% missing) & 675 of 675 ($\le
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-    paper,
-    xbar, bar width=4.4pt,
-    scale only axis, width=10.2cm, height=6.6cm,
-    xmode=log, log basis x=10, xmin=1, xmax=4e7,
-    xtick={10,100,1000,10000,100000,1000000},
-    xticklabels={10,100,{1,000},{10,000},{100,000},{1,000,000}},
-    xmajorgrids, axis lines=left, clip=false,
-    xlabel={Count, logarithmic scale},
-    symbolic y coords={bLR,bCB,pLR,pCB,cand,univ,dev},
-    ytick={bLR,bCB,pLR,pCB,cand,univ,dev},
-    yticklabels={{Budget, LR ($\Kfeat=20$)},{Budget, CatBoost ($\Kfeat=40$)},{Semantic pool, LR},{Semantic pool, CatBoost},{Screened candidate set},{Engineered universe},{DEV decisions}},
-    enlarge y limits=0.1,
-    legend style={at={(0.985,0.03)}, anchor=south east, legend columns=1, cells={anchor=west}},
-    reverse legend,
-    nodes near coords, point meta=explicit symbolic,
-    every node near coord/.append style={font=\scriptsize, anchor=west, xshift=1pt},
+  paper,
+  xbar, bar width=4.4pt,
+  scale only axis, width=10.2cm, height=6.6cm,
+  xmode=log, log basis x=10, xmin=1, xmax=4e7,
+  xtick={10,100,1000,10000,100000,1000000},
+  xticklabels={10,100,{1,000},{10,000},{100,000},{1,000,000}},
+  xmajorgrids, axis lines=left, clip=false,
+  xlabel={Count, logarithmic scale},
+  symbolic y coords={bLR,bCB,pLR,pCB,cand,univ,dev},
+  ytick={bLR,bCB,pLR,pCB,cand,univ,dev},
+  yticklabels={{Budget, LR ($\Kfeat=20$)},{Budget, CatBoost ($\Kfeat=40$)},{Semantic pool, LR},{Semantic pool, CatBoost},{Screened candidate set},{Engineered universe},{DEV decisions}},
+  enlarge y limits=0.1,
+  legend style={at={(0.985,0.03)}, anchor=south east, legend columns=1, cells={anchor=west}},
+  reverse legend,
+  nodes near coords, point meta=explicit symbolic,
+  every node near coord/.append style={font=\scriptsize, anchor=west, xshift=1pt},
 ]
 \addplot[fill=cGrey, draw=cGrey!70!black, bar shift=0pt] coordinates {(20,bLR) [20] (40,bCB) [40] (60,pLR) [60] (100,pCB) [100]};
 \addlegendentry{Same in all three datasets}
@@ -457,24 +457,24 @@ Let $y_i\in\{0,1\}$ be the event label of HO observation $i$, $p_i$ its predicte
 \paragraph{ROC-AUC}
 The area under the receiver operating characteristic curve is the probability that a randomly chosen event scores higher than a randomly chosen non-event, with half credit for ties \cite{hanley1982},
 \begin{equation}
-    \AUC=\frac{1}{N_+N_-}\sum_{i:\,y_i=1}\sum_{j:\,y_j=0}\big[\mathbf{1}(p_i>p_j)+\tfrac12\mathbf{1}(p_i=p_j)\big].
-    \label{eq:roc_auc}
+  \AUC=\frac{1}{N_+N_-}\sum_{i:\,y_i=1}\sum_{j:\,y_j=0}\big[\mathbf{1}(p_i>p_j)+\tfrac12\mathbf{1}(p_i=p_j)\big].
+  \label{eq:roc_auc}
 \end{equation}
 Higher is better. ROC-AUC is threshold-free and is the sole headline metric; the Gini coefficient $2\,\AUC-1$ adds no information.
 
 \paragraph{KS}
 The Kolmogorov--Smirnov statistic is the maximum vertical separation between the cumulative score distributions of events and non-events,
 \begin{equation}
-    \KS=\max_{t}\,\big[\TPR(t)-\FPR(t)\big],
-    \label{eq:ks}
+  \KS=\max_{t}\,\big[\TPR(t)-\FPR(t)\big],
+  \label{eq:ks}
 \end{equation}
 which equals the maximum Youden index over thresholds \cite{youden1950}; higher is better. KS is reported as the maximum HO separation. A KS-optimal operating threshold is also recorded in each freeze manifest for deployment, but no threshold-dependent metric is reported, so the threshold plays no part in the results.
 
 \paragraph{Brier score}
 The Brier score is the mean squared error of the predicted probabilities \cite{brier1950},
 \begin{equation}
-    \mathrm{Brier}=\frac{1}{N}\sum_{i=1}^{N}(y_i-p_i)^2 ,
-    \label{eq:brier}
+  \mathrm{Brier}=\frac{1}{N}\sum_{i=1}^{N}(y_i-p_i)^2 ,
+  \label{eq:brier}
 \end{equation}
 lower is better. It measures the overall squared error of the predicted probabilities, which combines calibration and resolution, rather than ranking; a constant prediction equal to the event rate $\pi$ attains $\pi(1-\pi)$, and log loss, $-N^{-1}\sum_i[y_i\ln p_i+(1-y_i)\ln(1-p_i)]$, is a supporting diagnostic. Because both backbones use balanced class weights and no recalibration (Section~\ref{subsec:models}), their outputs are not population event probabilities, so Brier values compare selectors within a dataset and do not indicate deployment-ready calibration.
 
@@ -482,26 +482,26 @@ lower is better. It measures the overall squared error of the predicted probabil
 Let $T$ be the set of observations in the highest-scored decile, a fraction $q=|T|/N\approx0.10$ of the population. Capture@10 is the share of all events found in that decile and Lift@10 the ratio of the decile event rate to the portfolio event rate,
 \begin{equation}
 \begin{aligned}
-    \mathrm{Capture@10}&=\frac{\sum_{i\in T}y_i}{\sum_{i}y_i},\\
-    \mathrm{Lift@10}&=\frac{|T|^{-1}\sum_{i\in T}y_i}{N^{-1}\sum_{i}y_i}=\frac{\mathrm{Capture@10}}{q};
+  \mathrm{Capture@10}&=\frac{\sum_{i\in T}y_i}{\sum_{i}y_i},\\
+  \mathrm{Lift@10}&=\frac{|T|^{-1}\sum_{i\in T}y_i}{N^{-1}\sum_{i}y_i}=\frac{\mathrm{Capture@10}}{q};
 \end{aligned}
-    \label{eq:capture10}
+  \label{eq:capture10}
 \end{equation}
 higher is better, and Lift equals ten times Capture only when the decile is exact.
 
 \paragraph{PSI}
 The population stability index compares a reference distribution with a later distribution over frozen states $b$,
 \begin{equation}
-    \PSI=\sum_{b}\big(o_b-r_b\big)\ln\frac{o_b}{r_b},
-    \label{eq:psi}
+  \PSI=\sum_{b}\big(o_b-r_b\big)\ln\frac{o_b}{r_b},
+  \label{eq:psi}
 \end{equation}
 where $r_b$ and $o_b$ are the reference (DEV) and HO proportions in state $b$ \cite{siddiqi2006,yurdakul2020}; lower indicates less shift. PSI is reported for the selected features only. A score PSI computed in earlier versions compared out-of-fold DEV scores of the five fold models with HO scores of the full-DEV refit, so it mixed scoring-model differences with population change, and it is not reported. For \emph{feature PSI} the states are type-aware: DEV quantile bins plus a missing state for continuous variables, explicit 0/1/missing/unexpected states for binary and one-hot variables, exact DEV levels for discrete variables, and DEV categories plus missing and unseen states for source categoricals. Bins and states are learned on DEV, frozen and applied unchanged to HO; mean, median and maximum feature PSI over the selected subset summarise drift within the chosen inputs. A feature PSI of zero means that no distribution difference was detected under the implemented states, binning and numerical precision, not that the underlying distributions are identical. The conventional references of 0.10 and 0.25 are descriptive monitoring thresholds, not critical values \cite{yurdakul2020}.
 
 \paragraph{Nogueira stability}
 Let $Z_{fj}\in\{0,1\}$ indicate whether feature $j$ of a candidate universe of size $d$ is selected in the $f$-th of $B$ selected subsets, $f=1,\dots,B$. Throughout the paper the subsets are the five development folds, $B=5$, except in the repeated-call measurement of Section~\ref{subsec:stability_results}, where they are ten responses to one fixed prompt, $B=10$. With $\hat p_j=B^{-1}\sum_f Z_{fj}$, $s_j^2=\frac{B}{B-1}\hat p_j(1-\hat p_j)$ and $\bar k=\sum_j \hat p_j$, the Nogueira estimator is \cite{nogueira2018}
 \begin{equation}
-    \hat\Phi=1-\frac{d^{-1}\sum_{j=1}^{d}s_j^2}{(\bar k/d)\,(1-\bar k/d)} .
-    \label{eq:nogueira}
+  \hat\Phi=1-\frac{d^{-1}\sum_{j=1}^{d}s_j^2}{(\bar k/d)\,(1-\bar k/d)} .
+  \label{eq:nogueira}
 \end{equation}
 It equals 1 when the same subset is selected in every fold, is chance-corrected so that random selection gives values near 0, and can be negative. The universe $d$ is the pool from which the fold-local selector chose: the screened candidate set (373, 675 or 1,068 features) for the classical selectors, the LLM hybrids and the pure LLM lists. $\hat\Phi$ is reported for selectors refitted in each fold and, over the same candidate set, for the pure LLM lists, which were requested separately per fold rather than refitted; because the candidate list supplied is the same in every call (Section~\ref{subsec:llm_fs}), a fold-to-fold difference between those lists reflects the sampling of the language model at a fixed prompt rather than any change in what it was asked to rank. Section~\ref{subsec:stability_results} reports a direct measurement of that sampling on Stability 2024.
 
@@ -532,19 +532,13 @@ HO rows are excluded from eligibility screening, feature selection, ranking cons
 
 Table~\ref{tab:primary_results} and Figure~\ref{fig:primary} report the six comparisons that address RQ1. In each dataset--backbone case the LLM-assisted and the classical family leader, the selector with the highest observed HO AUC in its family, are compared on identical HO observations; both leaders were chosen on the HO results, so the differences of Table~\ref{tab:primary_results} are descriptive and no significance is claimed for them (Section~\ref{subsec:inference}); the development-rule comparison with leaders chosen on development data follows below. The LLM-assisted leader has the higher held-out ROC-AUC in five of the six cases and the classical leader in the sixth. The LLM-assisted leader is pure LLM in four cases (Home Credit CatBoost, LendingClub v2 LR, Stability 2024 LR and Stability 2024 CatBoost), LLM then mRMR in one (LendingClub v2 CatBoost) and stable core plus LLM fill in the remaining case, Home Credit LR, where the classical selector leads.
 
-The pattern is dataset- and model-specific. LendingClub v2 and Stability 2024 favour LLM-assisted selection under both backbones, with differences of $+0.013$ to $+0.051$ for the cached rankings; on Stability 2024 the same two comparisons span $+0.0086$ to $+0.0181$ and $+0.0194$ to $+0.0286$ over ten repeated calls (Section~\ref{subsec:stability_results}). Home Credit is mixed: with CatBoost, pure LLM exceeds the RFE CatBoost wrapper by $+0.012$, whereas with logistic regression mutual-information mRMR exceeds stable core plus LLM fill by $0.021$. Against the materiality bar of $0.010$ (Section~\ref{subsec:inference}), all five positive differences clear it in point estimate under each of the three leader rules for the cached rankings, the smallest being $+0.012$; on Stability 2024, where the effect of the semantic response was isolated directly, the margin falls below the bar in two of ten repeated calls with logistic regression and in none of the ten with CatBoost, while its sign is unchanged in all twenty refits (Section~\ref{subsec:stability_results}); the Home Credit CatBoost interval under the HO rule, $[+0.009, +0.015]$, is the only one of the five that includes values below the bar, and the Home Credit logistic-regression difference is material under the HO rule ($0.021$) and at the bar under the development rule ($0.010$, interval $[-0.013, -0.008]$). The classical leader changes identity across cases (mRMR, RFE CatBoost, IV then Boruta or CatBoost SHAP), so a single classical baseline would have represented classical selection differently in each case; the classical family contains nine selectors and the LLM-assisted family four. The pattern does not depend on comparing family leaders: excluding the three selectors declared as floors (domain rules, Random~$\Kfeat$ and PCA), the mean HO AUC of the remaining six classical selectors is below the mean of the four LLM-assisted pipelines in the same five cases, by $0.010$ to $0.026$, and above it on Home Credit logistic regression by $0.007$ (Table~\ref{tab:full_matrix}). An L1-penalised logistic regression selector, run afterwards on the same candidate sets, folds and budgets (\texttt{liblinear}, $C=0.05$ fixed and untuned, balanced class weights, standardised median-imputed inputs with ordinal-coded categoricals, the $\Kfeat$ largest non-zero coefficients retained without padding, and the subsets refitted with the fixed backbones of Section~\ref{subsec:models}), attains held-out AUC of 0.674 to 0.792 and lies below the classical family leader in every case, by 0.005 on LendingClub CatBoost and by 0.026 to 0.096 elsewhere, so its inclusion would change no leader and no comparison. The one-hot encoding of Section~\ref{subsec:preprocessing} is likewise not what carries the ordering. Re-running the three CatBoost cases with CatBoost's native categorical handling in place of one-hot expansion, the same forty features, configuration and seed, moves every held-out AUC by at most $0.005$ and leaves the family ordering unchanged in all three: pure LLM 0.7918 against RFE CatBoost 0.7816 on Home Credit, LLM then mRMR 0.7738 against IV then Boruta 0.7203 on LendingClub v2, and pure LLM 0.8784 against CatBoost SHAP 0.8592 on Stability 2024, margins of $+0.010$, $+0.054$ and $+0.019$ against $+0.012$, $+0.051$ and $+0.024$ under one-hot. The Stability 2024 pure LLM subset contains no categorical features, so its value is unchanged by construction. The largest difference, $+0.051$ on LendingClub with CatBoost, sits on the population with the strongest known selection artefact: only loans resolved by the 2019-05-01 snapshot are evaluated, a restriction that over-represents early defaults and early repayments and raises the HO event rate from 19.5\% in DEV to 23.3\% (Section~\ref{subsec:dev_oot}), so this difference describes the resolved-loan population and should be read with that construction in mind. The restriction applies to the evaluation population and not to any selector: all thirteen selectors are scored on the same 293,105 loans, so it shifts the level of every AUC in this column rather than acting differentially on one family. Whether the retained population favours the kind of signal one family selects, early default rather than late, is tested directly in the next paragraph.
-
-That test re-scores the LendingClub comparison of Table~\ref{tab:primary_results} on the frozen HO prediction vectors as row filters, with no refitting, and bootstraps each filtered set by the routine of Section~\ref{subsec:inference}. The pre-declared filter is the cohort that could have matured before the snapshot: the 123,898 36-month loans issued 2016-01 to 2016-05, every one of which had reached its term by 2019-05-01, so the resolution filter cannot act on it. The comparison is also resolved by term and by issue month. Table~\ref{tab:lc_maturity} reports the matured cohort and the two terms. The LLM-assisted leader has the higher AUC in all thirty comparisons, every interval excludes zero, and the difference clears the materiality bar of $0.010$ on the matured cohort and within each term under both backbones: $+0.018$ and $+0.011$ on the matured cohort, $+0.022$ and $+0.012$ on the 36-month loans and $+0.014$ and $+0.010$ on the 60-month loans. Resolved by issue month, the difference is positive in all twelve months of 2016 under both backbones. The margins are smaller on these sub-populations than on the pooled holdout, where the loans of different terms and vintages are ranked together; the direction of the comparison and its materiality do not depend on the resolution filter.
-
-A subset drawn from few source tables invites the objection that any rule concentrating on the same tables would do as well: the pure LLM subsets on Stability 2024 are drawn entirely from \texttt{static\_0} under both budgets, and on Home Credit CatBoost 26 of the 40 features are bureau aggregates, whereas the classical leaders of those cases spread across six or seven source families (\ref{app:subsets}). The two diversity controls of Section~\ref{subsec:classical_fs} test it, and Table~\ref{tab:diversity} reports them. Capping the classical leader per source family lowers it in all six cases, by $0.009$ to $0.064$, so the cap binds; the capped selector remains below the LLM-assisted leader of its case by $0.021$ to $0.077$ in five of the six. On Home Credit logistic regression, the one case the classical selector wins, the cap erases that lead: mRMR falls from $0.7699$ to $0.7457$ against the LLM-assisted leader's $0.7489$, leaving the two families level within the bar. On Stability 2024 the sharper test is the depth-0 restriction, which confines the classical leader to the two static tables the semantic ranking chose from: it reaches $0.7748$ with logistic regression and $0.8209$ with CatBoost, against $0.8344$ and $0.8784$ for pure LLM over the same pool, a shortfall of $0.060$ and $0.058$. Source concentration alone therefore does not reproduce the Stability 2024 margins, and the semantic reading of those two cases stands with the control reported as the test it passed.
+The pattern is dataset- and model-specific. LendingClub v2 and Stability 2024 favour LLM-assisted selection under both backbones, with differences of $+0.013$ to $+0.051$ for the cached rankings; on Stability 2024 the same two comparisons span $+0.0086$ to $+0.0181$ and $+0.0194$ to $+0.0286$ over ten repeated calls (Section~\ref{subsec:stability_results}). Home Credit is mixed: with CatBoost, pure LLM exceeds the RFE CatBoost wrapper by $+0.012$, whereas with logistic regression mutual-information mRMR exceeds stable core plus LLM fill by $0.021$. Against the materiality bar of $0.010$ (Section~\ref{subsec:inference}), all five positive differences clear it in point estimate under each of the three leader rules for the cached rankings, the smallest being $+0.012$; on Stability 2024, where the effect of the semantic response was isolated directly, the margin falls below the bar in two of ten repeated calls with logistic regression and in none of the ten with CatBoost, while its sign is unchanged in all twenty refits (Section~\ref{subsec:stability_results}); the Home Credit CatBoost interval under the HO rule, $[+0.009, +0.015]$, is the only one of the five that includes values below the bar, and the Home Credit logistic-regression difference is material under the HO rule ($0.021$) and at the bar under the development rule ($0.010$, interval $[-0.013, -0.008]$). The classical leader changes identity across cases (mRMR, RFE CatBoost, IV then Boruta or CatBoost SHAP), so a single classical baseline would have represented classical selection differently in each case; the classical family contains nine selectors and the LLM-assisted family four. The pattern does not depend on comparing family leaders: excluding the three selectors declared as floors (domain rules, Random~$\Kfeat$ and PCA), the mean HO AUC of the remaining six classical selectors is below the mean of the four LLM-assisted pipelines in the same five cases, by $0.010$ to $0.026$, and above it on Home Credit logistic regression by $0.007$ (Table~\ref{tab:full_matrix}). An L1-penalised selector run afterwards, CatBoost's native categorical handling, the LendingClub resolution filter and the source concentration of the subsets are examined as robustness checks in Section~\ref{subsec:robustness}, and the input width each headline subset delivers to its model, which $\Kfeat$ does not fix, is reported in \ref{app:robustness} (Table~\ref{tab:dimension}).
 
 Table~\ref{tab:confirmatory} repeats the comparison with leaders chosen on development data, the selector with the highest mean validation AUC over the five DEV folds in each family. The rule changes the compared pair in five of the six cases: the classical leader becomes IV then Boruta on both Home Credit cases and RFE CatBoost on both LendingClub v2 cases and on Stability 2024 CatBoost, and the LLM-assisted leader on Home Credit logistic regression becomes LLM then mRMR; only Stability 2024 logistic regression keeps its pair, pure LLM against RFE CatBoost, under both rules, which is why its difference is identical in the two tables. The ordering is unchanged. The DEV-chosen LLM-assisted leader has the higher HO AUC in five of six cases, by $+0.013$ to $+0.052$, every one of the five above the materiality bar, and the classical leader leads on Home Credit logistic regression by $0.010$, at the bar; five of the six margins are wider than under the HO rule. Choosing the leaders without the holdout therefore leaves the five-of-six result intact. On Stability 2024 CatBoost the DEV rule prefers RFE CatBoost over pure LLM (0.8712 against 0.8662 on DEV) and pure LLM is nevertheless higher on HO by $+0.028$, so the development-rule margin there is out-of-sample in both directions.
 
 The two rules share five of their six LLM-assisted leaders, so a third and most adversarial pairing can be read from the same tables: the LLM-assisted leader chosen on development data against the classical leader chosen on the HO results. In five cases it is the pair of Table~\ref{tab:primary_results} and carries that table's difference and interval, $+0.012$, $+0.030$, $+0.051$, $+0.013$ and $+0.024$; on Home Credit logistic regression it pairs LLM then mRMR (0.7432) with mRMR (0.7699), a difference of $-0.027$ reported as a point estimate, its interval not computed. The five-of-six pattern therefore holds under all three rules, and the LLM-assisted margins under the most adversarial rule are those of Table~\ref{tab:primary_results}. The two rules are not, however, independent checks, and the reason is visible in the DEV and HO values that Table~\ref{tab:confirmatory} prints side by side. Choosing a leader on development data can only lower or preserve its HO AUC relative to the HO-best selector of its family, and the rule costs the two families unequally: the DEV-chosen classical leader is the HO-best classical selector only on Stability 2024 logistic regression and sits below it by 0.001 to 0.017 in the other five cases, whereas the DEV-chosen LLM-assisted leader is the HO-best one in five cases and below it by 0.006 on Home Credit logistic regression. The development rule widens the margin because it costs the classical family more, not because the LLM-assisted leaders rise. The same asymmetry appears within each leader: from DEV mean to HO AUC the classical leaders of Table~\ref{tab:confirmatory} fall by 0.008 to 0.022 in five cases and hold level on Stability 2024 logistic regression, while the LLM-assisted leaders move by $-0.010$ to $+0.012$ and rise in three cases. The smaller development-to-holdout change of the LLM-assisted subsets is a finding in its own right, consistent with their lower selected-feature drift (Table~\ref{tab:primary_results}), and it means that the agreement between the two leader rules is partly a consequence of that finding rather than an independent corroboration of it.
 
-The budget counts original variables, not columns (Section~\ref{subsec:preprocessing}), so a subset that contains categorical variables delivers more than $\Kfeat$ columns to its model. Table~\ref{tab:dimension} gives $\Kfeat$ and the column count for the twelve headline subsets, after the full-DEV preprocessing map of each backbone. The widest input anywhere in the study is 174 columns, the CatBoost SHAP subset of Stability 2024 at $\Kfeat=40$, whose nine categorical variables carry the expansion; the LLM-assisted leader of that case receives 40. The LLM-assisted leader receives fewer columns than the classical leader in five of the six cases, by 5 to 134 columns, so in those five the margin is not obtained on a wider input matrix. Home Credit with CatBoost is the exception: the pure LLM subset carries five categorical variables, which expand to 37 of its 72 columns, against three in the RFE CatBoost wrapper, which expand to 13 of its 50. Its $+0.012$, the smallest of the five positive differences, is therefore obtained on the wider matrix of the two, and should be read with the native-categorical re-run reported above, where no expansion takes place and the same comparison stands at $+0.010$. One subset is budgeted on the expanded scale rather than the original one, the LLM then mRMR leader of LendingClub v2 with CatBoost (Section~\ref{subsec:preprocessing}): 13 of its 40 slots are one-hot indicators drawn from seven original variables, so it spans 34 original variables in 40 columns, against 40 original variables in 77 columns for its classical comparator, fewer on both scales. These counts change no leader, no difference and no interval; they are reported because $\Kfeat$ and the input width are not the same quantity and only the first is fixed by the design.
-
-The column ``Full'' gives the HO AUC of a model fitted on every candidate feature (373 and 675; the unscreened 1,959 for Stability 2024) with the same fixed backbone configuration as the compact models; the reference was not tuned for the wider problem (Section~\ref{subsec:models}), so it is context only and no claim is made that compact subsets outperform the full feature set. Table~\ref{tab:full_matrix} reports the HO AUC of every selector of the two families in every case, so that each leader margin can be read against the spread of its own family. On Home Credit the order of mRMR alone and LLM then mRMR depends on the backbone: with logistic regression mRMR on the whole candidate set is higher (0.7699 against 0.7432), with CatBoost LLM then mRMR is higher (0.7758 against 0.7599). The twelve headline subsets themselves, the full-DEV selections of the two leaders of each case, are listed in \ref{app:subsets}. Protected attributes (Section~\ref{subsec:llm_fs}) appear in the subsets of both families. On Home Credit, \texttt{CODE\_GENDER} holds rank 3 in the mRMR logistic-regression subset, rank 14 in the RFE CatBoost subset and rank 10 in the pure LLM CatBoost subset, and \texttt{NAME\_FAMILY\_STATUS} holds rank 9 in the pure LLM CatBoost subset and rank 39 in the RFE CatBoost subset; on Stability 2024 the two aggregates of the person-table sex field occupy ranks 1 and 6 of the CatBoost SHAP subset and no LLM-assisted subset contains one; the LendingClub v2 headline subsets contain no such field. Their presence is a property of the released universes rather than of either family, and the expert persona of the prompt did not exclude them unasked. Pure LLM screening is the LLM-assisted leader in four of the six cases and within 0.006 of it on Home Credit logistic regression; LLM then mRMR leads it by 0.037 on LendingClub v2 CatBoost; LLM then Boruta has the lowest AUC among the four pipelines in every case. This is not an artefact of short subsets: over the 108 fold and full-DEV refits of the three Boruta-based selectors (Boruta RF, IV then Boruta and LLM then Boruta; six cases, six partitions each) the Boruta stage reached its budget in 104, every full-DEV refit among them, and LLM then Boruta fell short only once, on Stability 2024 CatBoost fold 1 with 35 of 40 features; the other three below-budget cells are Boruta RF on Home Credit CatBoost fold 1 (26 of 40) and IV then Boruta on Home Credit CatBoost folds 1 and 2 (20 and 39 of 40). On Stability 2024 the four pipelines lie within 0.022 of one another with logistic regression (0.8123 to 0.8344) and within 0.035 with CatBoost (0.8435 to 0.8784), pure LLM leading under both backbones. The Stability 2024 comparison was also resolved by month of decision over the nine months of its held-out window, February to October 2020. Pure LLM has the higher AUC in every one of the nine months under both backbones, by $+0.004$ to $+0.026$ against RFE CatBoost with logistic regression and by $+0.005$ to $+0.055$ against CatBoost SHAP with CatBoost, so the direction of the comparison does not depend on the period within the window. The window contains a sharp break in volume: 60,183 decisions were taken in February and 23,289 in April, a fall of 61 per cent that coincides with the onset of the COVID-19 pandemic (Section~\ref{subsec:cross_dataset}).
+The column ``Full'' gives the HO AUC of a model fitted on every candidate feature (373 and 675; the unscreened 1,959 for Stability 2024) with the same fixed backbone configuration as the compact models; the reference was not tuned for the wider problem (Section~\ref{subsec:models}), so it is context only and no claim is made that compact subsets outperform the full feature set. Table~\ref{tab:full_matrix} reports the HO AUC of every selector of the two families in every case, so that each leader margin can be read against the spread of its own family. On Home Credit the order of mRMR alone and LLM then mRMR depends on the backbone: with logistic regression mRMR on the whole candidate set is higher (0.7699 against 0.7432), with CatBoost LLM then mRMR is higher (0.7758 against 0.7599). The twelve headline subsets themselves, the full-DEV selections of the two leaders of each case, are listed in \ref{app:subsets}. Protected attributes (Section~\ref{subsec:llm_fs}) appear in the subsets of both families. On Home Credit, \texttt{CODE\_GENDER} holds rank 3 in the mRMR logistic-regression subset, rank 14 in the RFE CatBoost subset and rank 10 in the pure LLM CatBoost subset, and \texttt{NAME\_FAMILY\_STATUS} holds rank 9 in the pure LLM CatBoost subset and rank 39 in the RFE CatBoost subset; on Stability 2024 the two aggregates of the person-table sex field occupy ranks 1 and 6 of the CatBoost SHAP subset and no LLM-assisted subset contains one; the LendingClub v2 headline subsets contain no such field. Their presence is a property of the released universes rather than of either family, and the expert persona of the prompt did not exclude them unasked. Pure LLM screening is the LLM-assisted leader in four of the six cases and within 0.006 of it on Home Credit logistic regression; LLM then mRMR leads it by 0.037 on LendingClub v2 CatBoost; LLM then Boruta has the lowest AUC among the four pipelines in every case, which is not an artefact of short subsets: the Boruta stage reached its budget in 104 of its 108 fold and full-DEV refits, every full-DEV refit among them (\ref{app:robustness}). On Stability 2024 the four pipelines lie within 0.022 of one another with logistic regression (0.8123 to 0.8344) and within 0.035 with CatBoost (0.8435 to 0.8784), pure LLM leading under both backbones; resolved by month of decision, pure LLM has the higher AUC in every one of the nine months of the held-out window under both backbones (\ref{app:robustness}).
 
 \begin{table*}[htbp]
 \centering
@@ -636,113 +630,20 @@ LLM-assisted leader $-$ classical leader & $-0.021$ & $+0.012$ & $+0.030$ & $+0.
 \end{threeparttable}
 \end{table*}
 
-\begin{table}[htbp]
-\centering
-\footnotesize
-\begin{threeparttable}
-\caption{LendingClub v2 held-out comparison of Table~\ref{tab:primary_results} re-scored on sub-populations of the holdout, as row filters on the frozen HO prediction vectors with no refitting. The matured cohort is the 36-month loans issued 2016-01 to 2016-05, all of which had reached term before the 2019-05-01 snapshot, so the resolution filter of Section~\ref{subsec:dev_oot} cannot act on it; the two terms partition the holdout. $\Delta$AUC is the LLM-assisted leader minus the classical leader, read against the materiality bar of $0.010$ (Section~\ref{subsec:inference}).}
-\label{tab:lc_maturity}
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}lrrr@{}}
-\toprule
-Sub-population & $n$ & LR & CatBoost \\
-\midrule
-Matured cohort\tnote{a} & 123,898 & $+0.0183$ & $+0.0112$ \\
-Term 36 months & 232,361 & $+0.0215$ & $+0.0122$ \\
-Term 60 months & 60,744 & $+0.0141$ & $+0.0101$ \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}\footnotesize
-\item[a] Paired 95\% bootstrap intervals on the matured cohort: $[+0.0159,\,+0.0207]$ with logistic regression and $[+0.0099,\,+0.0126]$ with CatBoost. Every interval of every sub-population reported here and by issue month excludes zero; the full set, with the AUC of each leader, is in the repository.
-\end{tablenotes}
-\end{threeparttable}
-\end{table}
-
-\begin{table*}[htbp]
-\centering
-\footnotesize
-\begin{threeparttable}
-\caption{Diversity controls on the headline comparison (Section~\ref{subsec:primary_results}). \emph{Family cap} re-runs the HO-rule classical leader of each case with at most $\lceil \Kfeat/F\rceil$ features per source family; \emph{depth-0} restricts it to the depth-0 candidates of Stability 2024. Both are fitted on full DEV with the frozen backbones and scored once on HO. ``Uncapped'' is the classical leader's own HO AUC (Table~\ref{tab:primary_results}) and ``LLM-assisted'' its LLM-assisted counterpart in the same case; the last column is the control minus that counterpart, read against the materiality bar of $0.010$ (Section~\ref{subsec:inference}). The controls are not selectors of the comparison and appear in no family, leader or count.}
-\label{tab:diversity}
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}llllrrrr@{}}
-\toprule
-Case & Rule & Base selector & $\Kfeat$ & Control & Uncapped & LLM-assisted & Difference \\
-\midrule
-Home Credit, LR & Family cap & mRMR & 20 & 0.7457 & 0.7699 & 0.7489 & $-0.003$\tnote{a} \\
-Home Credit, CatBoost & Family cap & RFE CatBoost & 40 & 0.7721 & 0.7814 & 0.7935 & $-0.021$ \\
-LendingClub v2, LR & Family cap & IV then Boruta & 20 & 0.6849 & 0.7098 & 0.7402 & $-0.055$ \\
-LendingClub v2, CatBoost & Family cap & IV then Boruta & 40 & 0.7065 & 0.7201 & 0.7707 & $-0.064$ \\
-Stability 2024, LR & Family cap & RFE CatBoost & 20 & 0.7579 & 0.8214 & 0.8344 & $-0.077$ \\
-Stability 2024, CatBoost & Family cap & CatBoost SHAP & 40 & 0.8314 & 0.8546 & 0.8784 & $-0.047$ \\
-\addlinespace
-Stability 2024, LR & Depth-0 & RFE CatBoost & 20 & 0.7748 & 0.8214 & 0.8344 & $-0.060$ \\
-Stability 2024, CatBoost & Depth-0 & CatBoost SHAP & 40 & 0.8209 & 0.8546 & 0.8784 & $-0.058$ \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}\footnotesize
-\item[a] The classical selector wins this case uncapped (0.7699); the cap removes that lead and leaves the two families level within the materiality bar.
-\end{tablenotes}
-\end{threeparttable}
-\end{table*}
-
-\begin{table}[htbp]
-\centering
-\scriptsize
-\begin{threeparttable}
-\caption{Effective dimension of the twelve headline subsets of Table~\ref{tab:primary_results}. ``Cat.'' is the number of the $\Kfeat$ selected original variables that are categorical; ``Columns'' is the number of columns the backbone receives after the full-DEV preprocessing map of Section~\ref{subsec:preprocessing}, with an explicit missing token per categorical and levels below the minimum frequency dropped (10 observations for Home Credit and Stability 2024, 50 for LendingClub v2). Subsets with no categorical variable receive exactly $\Kfeat$ columns.}
-\label{tab:dimension}
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}lrrr@{}}
-\toprule
-Selector & $\Kfeat$ & Cat. & Columns \\
-\midrule
-\multicolumn{4}{@{}l}{\emph{Home Credit, LR}} \\
-Stable core + LLM fill & 20 & 0 & 20 \\
-mRMR & 20 & 3 & 33 \\
-\addlinespace
-\multicolumn{4}{@{}l}{\emph{Home Credit, CatBoost}} \\
-Pure LLM & 40 & 5 & 72 \\
-RFE CatBoost & 40 & 3 & 50 \\
-\addlinespace
-\multicolumn{4}{@{}l}{\emph{LendingClub v2, LR}} \\
-Pure LLM & 20 & 5 & 43 \\
-IV then Boruta & 20 & 5 & 48 \\
-\addlinespace
-\multicolumn{4}{@{}l}{\emph{LendingClub v2, CatBoost}} \\
-LLM then mRMR\tnote{a} & 40 & 0 & 40 \\
-IV then Boruta & 40 & 7 & 77 \\
-\addlinespace
-\multicolumn{4}{@{}l}{\emph{Stability 2024, LR}} \\
-Pure LLM & 20 & 0 & 20 \\
-RFE CatBoost & 20 & 1 & 28 \\
-\addlinespace
-\multicolumn{4}{@{}l}{\emph{Stability 2024, CatBoost}} \\
-Pure LLM & 40 & 0 & 40 \\
-CatBoost SHAP & 40 & 9 & 174 \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}\footnotesize
-\item[a] The only headline subset budgeted on the expanded scale (Section~\ref{subsec:preprocessing}): 13 of its 40 slots are one-hot indicators of seven original variables, so it spans 34 original variables. The LLM-assisted leader of each case is listed first.
-\end{tablenotes}
-\end{threeparttable}
-\end{table}
-
-
 \begin{figure*}[htbp]
 \centering
 \begin{tikzpicture}
 \begin{groupplot}[
-    paper,
-    group style={group size=2 by 1, horizontal sep=8mm, y descriptions at=edge left},
-    scale only axis, width=3.9cm, height=4.6cm,
-    ymin=0.4, ymax=6.6, ytick={1,2,3,4,5,6},
-    yticklabels={{Stability 2024, CatBoost},{Stability 2024, LR},{LendingClub, CatBoost},{LendingClub, LR},{Home Credit, CatBoost},{Home Credit, LR}},
-    xmajorgrids, axis lines=left, clip=false,
-    xticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2},
+  paper,
+  group style={group size=2 by 1, horizontal sep=8mm, y descriptions at=edge left},
+  scale only axis, width=3.9cm, height=4.6cm,
+  ymin=0.4, ymax=6.6, ytick={1,2,3,4,5,6},
+  yticklabels={{Stability 2024, CatBoost},{Stability 2024, LR},{LendingClub, CatBoost},{LendingClub, LR},{Home Credit, CatBoost},{Home Credit, LR}},
+  xmajorgrids, axis lines=left, clip=false,
+  xticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2},
 ]
 \nextgroupplot[title={(a) Held-out ROC-AUC}, xlabel={ROC-AUC}, xmin=0.69, xmax=0.90, xtick={0.70,0.75,0.80,0.85,0.90},
-    legend to name=primlegend, legend columns=3]
+  legend to name=primlegend, legend columns=3]
 \addplot[cGrey, line width=1.4pt, forget plot] coordinates {(0.854644,1) (0.878400,1)};
 \addplot[cGrey, line width=1.4pt, forget plot] coordinates {(0.821394,2) (0.834400,2)};
 \addplot[cGrey, line width=1.4pt, forget plot] coordinates {(0.720147,3) (0.770664,3)};
@@ -750,32 +651,32 @@ CatBoost SHAP & 40 & 9 & 174 \\
 \addplot[cGrey, line width=1.4pt, forget plot] coordinates {(0.781426,5) (0.793450,5)};
 \addplot[cGrey, line width=1.4pt, forget plot] coordinates {(0.769890,6) (0.748857,6)};
 \addplot[only marks, mark=square*, mark size=2.6pt, cOrange]
-    coordinates {(0.854644,1) (0.821394,2) (0.720147,3) (0.709803,4) (0.781426,5) (0.769890,6)};
+  coordinates {(0.854644,1) (0.821394,2) (0.720147,3) (0.709803,4) (0.781426,5) (0.769890,6)};
 \addlegendentry{Classical family leader}
 \addplot[only marks, mark=*, mark size=2.8pt, cBlue]
-    coordinates {(0.878400,1) (0.834400,2) (0.770664,3) (0.740234,4) (0.793450,5) (0.748857,6)};
+  coordinates {(0.878400,1) (0.834400,2) (0.770664,3) (0.740234,4) (0.793450,5) (0.748857,6)};
 \addlegendentry{LLM-assisted family leader}
 \addplot[only marks, mark=triangle, mark size=3.2pt, thick, cGrey!60!black]
-    coordinates {(0.82449,1) (0.77191,2) (0.722973,3) (0.710887,4) (0.786032,5) (0.771496,6)};
+  coordinates {(0.82449,1) (0.77191,2) (0.722973,3) (0.710887,4) (0.786032,5) (0.771496,6)};
 \addlegendentry{Full-feature reference}
 \nextgroupplot[title={(b) Paired $\Delta$AUC, 95\% CI}, xlabel={LLM-assisted $-$ classical}, xmin=-0.04, xmax=0.066, xtick={-0.04,-0.02,0,0.02,0.04,0.06}]
 \draw[gray!60!black, dashed] (axis cs:0,0.4) -- (axis cs:0,6.6);
 \addplot[only marks, mark=*, mark size=2.8pt, cBlue,
-    error bars/.cd, x dir=both, x explicit,
-    error bar style={line width=1pt, cBlue},
-    error mark options={rotate=90, mark size=2.2pt, cBlue}]
-    coordinates {
-        (0.023756,1) -= (0.002795,0) += (0.002855,0)
-        (0.013006,2) -= (0.002365,0) += (0.002265,0)
-        (0.050517,3) -= (0.000805,0) += (0.000798,0)
-        (0.030431,4) -= (0.001072,0) += (0.001083,0)
-        (0.012024,5) -= (0.002711,0) += (0.002817,0)
-    };
+  error bars/.cd, x dir=both, x explicit,
+  error bar style={line width=1pt, cBlue},
+  error mark options={rotate=90, mark size=2.2pt, cBlue}]
+  coordinates {
+    (0.023756,1) -= (0.002795,0) += (0.002855,0)
+    (0.013006,2) -= (0.002365,0) += (0.002265,0)
+    (0.050517,3) -= (0.000805,0) += (0.000798,0)
+    (0.030431,4) -= (0.001072,0) += (0.001083,0)
+    (0.012024,5) -= (0.002711,0) += (0.002817,0)
+  };
 \addplot[only marks, mark=square*, mark size=2.6pt, cRed,
-    error bars/.cd, x dir=both, x explicit,
-    error bar style={line width=1pt, cRed},
-    error mark options={rotate=90, mark size=2.2pt, cRed}]
-    coordinates { (-0.021033,6) -= (0.001178,0) += (0.001253,0) };
+  error bars/.cd, x dir=both, x explicit,
+  error bar style={line width=1pt, cRed},
+  error mark options={rotate=90, mark size=2.2pt, cRed}]
+  coordinates { (-0.021033,6) -= (0.001178,0) += (0.001253,0) };
 \node[font=\scriptsize, above=6pt] at (axis cs:0.023756,1) {$+0.024$};
 \node[font=\scriptsize, above=6pt] at (axis cs:0.013006,2) {$+0.013$};
 \node[font=\scriptsize, above=6pt] at (axis cs:0.050517,3) {$+0.051$};
@@ -788,6 +689,50 @@ CatBoost SHAP & 40 & 9 & 174 \\
 \caption{Primary held-out (HO) comparison. (a) ROC-AUC of the classical family leader, the LLM-assisted family leader (the selector with the highest observed HO AUC within its family) and the untuned full-feature reference in each dataset--backbone case; the grey bar joins the two selectors being compared. (b) Paired difference, LLM-assisted minus classical, with its 95\% confidence interval; positive values favour LLM-assisted selection and the red square marks the one case in which the classical selector is higher. The intervals are paired bootstrap intervals, not adjusted for the selection of the compared methods on the same HO results; the comparison is descriptive, and Table~\ref{tab:confirmatory} gives the development-rule comparison with leaders chosen on development data. Plot code generated with AI assistance from the study's result files (see the declaration on generative AI).}
 \label{fig:primary}
 \end{figure*}
+
+\subsection{Robustness of the headline comparison}
+\label{subsec:robustness}
+
+The five-of-six result of Table~\ref{tab:primary_results} could be an artefact of how the compared pair was chosen, of the encoding, of the composition of a holdout, of the tables a subset draws from, or of the particular language-model response behind it. Table~\ref{tab:robustness} collects the twelve checks that address these readings, each with the alternative it rules out, its result and where its detail is reported. Under every check the LLM-assisted leader remains ahead in the same five cases; on Home Credit logistic regression the classical leader remains ahead under all three leader rules and under every re-ranking, and only the family cap, a control that handicaps the classical selector, brings the two families level there. The changes in AUC produced by re-ranking with obfuscated names, with descriptions rebuilt from lineage or with a repeated response all lie inside the materiality bar of $0.010$ (Section~\ref{subsec:inference}), and the L1 selector run after the fact changes no leader. The detail behind the checks not reported elsewhere in this section, with Tables~\ref{tab:lc_maturity}, \ref{tab:diversity} and \ref{tab:dimension}, is in \ref{app:robustness}.
+
+\begin{table*}[htbp]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{threeparttable}
+\caption{Robustness of the headline comparison. Each row is one check on the five-of-six result of Table~\ref{tab:primary_results}, the alternative reading it rules out, its result and where its detail is reported; differences are paired HO $\Delta$AUC, LLM-assisted minus classical unless stated, read against the materiality bar of $0.010$ (Section~\ref{subsec:inference}). HC LR is Home Credit with logistic regression.}
+\label{tab:robustness}
+\begin{tabular}{@{}L{30mm}L{24mm}L{\dimexpr\textwidth-30mm-24mm-12mm-27mm-8\tabcolsep\relax}L{12mm}L{27mm}@{}}
+\toprule
+Check & What it rules out & Result & Headline holds? & Source \\
+\midrule
+Leaders chosen on DEV folds & Pair chosen on HO results & LLM-assisted leader higher in 5 of 6, $+0.013$ to $+0.052$; classical leads HC LR by $0.010$ & Yes & Table~\ref{tab:confirmatory} \\
+\addlinespace
+DEV-chosen LLM-assisted vs HO-best classical & A favourable pairing & Held-out-rule margins in five cases; HC LR $-0.027$ & Yes & Section~\ref{subsec:primary_results} \\
+\addlinespace
+Native categorical handling (CatBoost) & One-hot artefact & AUC moves by at most $0.005$; ordering unchanged in all three cases & Yes & \ref{app:robustness} \\
+\addlinespace
+Per-family cap on the classical leader & Source concentration & Classical leader falls by $0.009$ to $0.064$; stays $0.021$ to $0.077$ below in 5 of 6; on HC LR the families end level within the bar ($-0.003$) & Yes & Table~\ref{tab:diversity} \\
+\addlinespace
+Depth-0 restriction (Stability 2024) & Same-table pool & Classical leader $0.060$ (LR) and $0.058$ (CatBoost) below pure LLM & Yes & Table~\ref{tab:diversity} \\
+\addlinespace
+Matured cohort (LendingClub) & Resolution filter & $+0.018$ (LR), $+0.011$ (CatBoost) & Yes & Table~\ref{tab:lc_maturity} \\
+\addlinespace
+Term split (LendingClub) & Term mix & 36 months $+0.022$ / $+0.012$; 60 months $+0.014$ / $+0.010$ & Yes & Table~\ref{tab:lc_maturity} \\
+\addlinespace
+Monthly breakdown (Stability 2024) & One favourable period & Pure LLM higher in all nine months under both backbones & Yes & \ref{app:robustness} \\
+\addlinespace
+Name obfuscation (Home Credit) & Name recall & $-0.0012$ (LR), $+0.0042$ (CatBoost) & Yes & Table~\ref{tab:obfuscation} \\
+\addlinespace
+Descriptions rebuilt from lineage & Hand-written phrasing & Held-out AUC moves by $-0.0064$ to $+0.0066$ & Yes & Table~\ref{tab:mechanical} \\
+\addlinespace
+Ten repeated LLM calls (Stability 2024) & A favourable response & Spread $0.0095$ (LR) and $0.0092$ (CatBoost); direction unchanged in all 20 refits & Yes & Section~\ref{subsec:stability_results} \\
+\addlinespace
+L1-penalised selector & Missing standard baseline & Below the classical leader in every case & Yes; changes no leader & \ref{app:robustness} \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table*}
 
 \subsection{Secondary Metrics}
 \label{subsec:secondary_results}
@@ -897,31 +842,31 @@ Stability 2024 & CatBoost & 40 & 10 & 0.8740--0.8832 & 0.0092 \\
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-    paper,
-    scale only axis, width=11cm, height=7.5cm,
-    axis lines=left, clip=false,
-    xlabel={Nogueira stability $\hat\Phi$}, ylabel={Mean pairwise Jaccard similarity},
-    xmin=0.39, xmax=1.00, ymin=0.28, ymax=0.96,
-    xtick={0.40,0.50,0.60,0.70,0.80,0.90,1.00},
-    ytick={0.30,0.40,0.50,0.60,0.70,0.80,0.90},
-    xticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2, /pgf/number format/zerofill},
-    yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2, /pgf/number format/zerofill},
-    xmajorgrids, ymajorgrids,
-    legend pos=south east, legend cell align=left,
+  paper,
+  scale only axis, width=11cm, height=7.5cm,
+  axis lines=left, clip=false,
+  xlabel={Nogueira stability $\hat\Phi$}, ylabel={Mean pairwise Jaccard similarity},
+  xmin=0.39, xmax=1.00, ymin=0.28, ymax=0.96,
+  xtick={0.40,0.50,0.60,0.70,0.80,0.90,1.00},
+  ytick={0.30,0.40,0.50,0.60,0.70,0.80,0.90},
+  xticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2, /pgf/number format/zerofill},
+  yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2, /pgf/number format/zerofill},
+  xmajorgrids, ymajorgrids,
+  legend pos=south east, legend cell align=left,
 ]
 \addplot[domain=0.40:0.96, samples=2, dashed, gray!60, forget plot] {x};
 \node[font=\scriptsize, gray!60!black, rotate=31, anchor=south] at (axis cs:0.50,0.50) {Jaccard $=$ Nogueira};
 \addplot[only marks, mark=*, mark size=2.8pt, cOrange]
-    coordinates {(0.8838,0.8053) (0.9588,0.9273) (0.7860,0.6666)};
+  coordinates {(0.8838,0.8053) (0.9588,0.9273) (0.7860,0.6666)};
 \addlegendentry{Classical leader, LR}
 \addplot[only marks, mark=square*, mark size=2.6pt, cOrange]
-    coordinates {(0.8403,0.7538) (0.9070,0.8462) (0.7793,0.6582)};
+  coordinates {(0.8403,0.7538) (0.9070,0.8462) (0.7793,0.6582)};
 \addlegendentry{Classical leader, CatBoost}
 \addplot[only marks, mark=*, mark size=2.8pt, cGreen]
-    coordinates {(0.5403,0.4076) (0.5517,0.4011)};
+  coordinates {(0.5403,0.4076) (0.5517,0.4011)};
 \addlegendentry{Pure LLM, LR}
 \addplot[only marks, mark=square*, mark size=2.6pt, cGreen]
-    coordinates {(0.4092,0.3149) (0.6280,0.4828)};
+  coordinates {(0.4092,0.3149) (0.6280,0.4828)};
 \addlegendentry{Pure LLM, CatBoost}
 \node[font=\scriptsize, anchor=south east, xshift=-2pt, yshift=2pt] at (axis cs:0.5403,0.4076) {HC};
 \node[font=\scriptsize, anchor=north west, xshift=2pt, yshift=-2pt] at (axis cs:0.5517,0.4011) {LC};
@@ -1114,10 +1059,10 @@ The authors declare that they have no known competing financial interests or per
 \section*{Data availability}
 The three datasets are publicly available on Kaggle, and their redistribution is governed by the terms of the respective competitions and dataset licences:
 \begin{itemize}
-    \item Home Credit Default Risk: \url{https://www.kaggle.com/competitions/home-credit-default-risk/data}
-    \item All Lending Club loan data: \url{https://www.kaggle.com/datasets/wordsforthewise/lending-club}
-    \item Home Credit -- Credit Risk Model Stability: \url{https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability/data}
-    \item Code, configuration files, cached LLM rankings, result files and the headline subsets: \url{https://github.com/dilshodazamjonov/Feature-Selection-Research}
+  \item Home Credit Default Risk: \url{https://www.kaggle.com/competitions/home-credit-default-risk/data}
+  \item All Lending Club loan data: \url{https://www.kaggle.com/datasets/wordsforthewise/lending-club}
+  \item Home Credit -- Credit Risk Model Stability: \url{https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability/data}
+  \item Code, configuration files, cached LLM rankings, result files and the headline subsets: \url{https://github.com/dilshodazamjonov/Feature-Selection-Research}
 \end{itemize}
 
 \appendix
@@ -1227,8 +1172,8 @@ This appendix reports the pre-declared classical rank-voting family in full; it 
 
 Rank aggregation combines several rankings of the same candidate set of $d$ features. For a feature with rank $r$ in a source ranking (rank 1 best) the normalised rank is
 \begin{equation}
-    r^{\mathrm{norm}}=\frac{r-1}{d-1},
-    \label{eq:normrank}
+  r^{\mathrm{norm}}=\frac{r-1}{d-1},
+  \label{eq:normrank}
 \end{equation}
 so that the best feature maps to 0 and the worst to 1. Averaging normalised ranks is a Borda-type rule \cite{dwork2001} in the tradition of ensemble feature selection \cite{saeys2008}.
 
@@ -1288,23 +1233,23 @@ The same curves separate the two factors that differ between the backbones. At e
 \centering
 \begin{tikzpicture}
 \begin{groupplot}[
-    paper,
-    group style={group size=2 by 1, horizontal sep=18mm},
-    scale only axis, width=4.9cm, height=4.0cm, clip=false,
-    xmin=5, xmax=55, xtick={10,20,30,40,50},
-    xlabel={Feature budget $\Kfeat$},
-    ymajorgrids, axis lines=left,
-    yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=3, /pgf/number format/zerofill},
+  paper,
+  group style={group size=2 by 1, horizontal sep=18mm},
+  scale only axis, width=4.9cm, height=4.0cm, clip=false,
+  xmin=5, xmax=55, xtick={10,20,30,40,50},
+  xlabel={Feature budget $\Kfeat$},
+  ymajorgrids, axis lines=left,
+  yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=3, /pgf/number format/zerofill},
 ]
 \nextgroupplot[title={(a) Mean DEV AUC}, ylabel={Difference in mean DEV AUC}, ymin=-0.024, ymax=0.009, ytick={-0.02,-0.015,-0.01,-0.005,0,0.005},
-    legend style={at={(0.98,0.05)}, anchor=south east, draw=none, fill=none, font=\scriptsize}]
+  legend style={at={(0.98,0.05)}, anchor=south east, draw=none, fill=none, font=\scriptsize}]
 \draw[gray!60!black, dashed] (axis cs:5,0) -- (axis cs:55,0);
 \addplot[cBlue, semithick, mark=*, mark size=2.2pt] coordinates {(10,-0.014735) (20,0.000000) (30,0.004031) (40,0.004990) (50,0.004506)};
 \addlegendentry{LR, $\Kfeat=20$}
 \addplot[cOrange, semithick, mark=square*, mark size=2.0pt] coordinates {(10,-0.018775) (20,-0.008273) (30,-0.001311) (40,0.000000) (50,-0.000587)};
 \addlegendentry{CatBoost, $\Kfeat=40$}
 \nextgroupplot[title={(b) Family-leader gap}, ylabel={Difference in DEV AUC}, ymin=-0.028, ymax=0.052, ytick={-0.02,-0.01,0,0.01,0.02,0.03,0.04,0.05},
-    legend to name=budgetlegend, legend columns=3, legend style={draw=none, fill=none, font=\scriptsize}]
+  legend to name=budgetlegend, legend columns=3, legend style={draw=none, fill=none, font=\scriptsize}]
 \draw[gray!60!black, dashed] (axis cs:5,0) -- (axis cs:55,0);
 \addplot[cBlue, semithick, mark=*, mark size=2.2pt] coordinates {(10,-0.013960) (20,-0.018022) (30,-0.021352) (40,-0.018588) (50,-0.017754)};
 \addlegendentry{Home Credit, LR}
@@ -1399,10 +1344,125 @@ Revision reported in this paper & A contrastive-representation selector, its tra
 \label{app:robustness}
 \setcounter{table}{0}\setcounter{figure}{0}
 
-This appendix holds the unmatched wall-clock times referred to in Section~\ref{subsec:cost_runtime}.
+This appendix gives the detail behind the robustness checks summarised in Table~\ref{tab:robustness} (Section~\ref{subsec:robustness}), with Tables~\ref{tab:lc_maturity}, \ref{tab:diversity} and \ref{tab:dimension}, and the unmatched wall-clock times referred to in Section~\ref{subsec:cost_runtime}.
+
+\paragraph{L1-penalised selector}
+An L1-penalised logistic regression selector, run afterwards on the same candidate sets, folds and budgets (\texttt{liblinear}, $C=0.05$ fixed and untuned, balanced class weights, standardised median-imputed inputs with ordinal-coded categoricals, the $\Kfeat$ largest non-zero coefficients retained without padding, and the subsets refitted with the fixed backbones of Section~\ref{subsec:models}), attains held-out AUC of 0.674 to 0.792 and lies below the classical family leader in every case, by 0.005 on LendingClub CatBoost and by 0.026 to 0.096 elsewhere, so its inclusion would change no leader and no comparison.
+
+\paragraph{Native categorical handling}
+The one-hot encoding of Section~\ref{subsec:preprocessing} is likewise not what carries the ordering. Re-running the three CatBoost cases with CatBoost's native categorical handling in place of one-hot expansion, the same forty features, configuration and seed, moves every held-out AUC by at most $0.005$ and leaves the family ordering unchanged in all three: pure LLM 0.7918 against RFE CatBoost 0.7816 on Home Credit, LLM then mRMR 0.7738 against IV then Boruta 0.7203 on LendingClub v2, and pure LLM 0.8784 against CatBoost SHAP 0.8592 on Stability 2024, margins of $+0.010$, $+0.054$ and $+0.019$ against $+0.012$, $+0.051$ and $+0.024$ under one-hot. The Stability 2024 pure LLM subset contains no categorical features, so its value is unchanged by construction.
+
+\paragraph{LendingClub resolved-loan population: matured cohort, term and issue month}
+The largest difference, $+0.051$ on LendingClub with CatBoost, sits on the population with the strongest known selection artefact: only loans resolved by the 2019-05-01 snapshot are evaluated, a restriction that over-represents early defaults and early repayments and raises the HO event rate from 19.5\% in DEV to 23.3\% (Section~\ref{subsec:dev_oot}), so this difference describes the resolved-loan population and should be read with that construction in mind. The restriction applies to the evaluation population and not to any selector: all thirteen selectors are scored on the same 293,105 loans, so it shifts the level of every AUC in this column rather than acting differentially on one family. Whether the retained population favours the kind of signal one family selects, early default rather than late, is tested directly in the next paragraph.
+
+That test re-scores the LendingClub comparison of Table~\ref{tab:primary_results} on the frozen HO prediction vectors as row filters, with no refitting, and bootstraps each filtered set by the routine of Section~\ref{subsec:inference}. The pre-declared filter is the cohort that could have matured before the snapshot: the 123,898 36-month loans issued 2016-01 to 2016-05, every one of which had reached its term by 2019-05-01, so the resolution filter cannot act on it. The comparison is also resolved by term and by issue month. Table~\ref{tab:lc_maturity} reports the matured cohort and the two terms. The LLM-assisted leader has the higher AUC in all thirty comparisons, every interval excludes zero, and the difference clears the materiality bar of $0.010$ on the matured cohort and within each term under both backbones: $+0.018$ and $+0.011$ on the matured cohort, $+0.022$ and $+0.012$ on the 36-month loans and $+0.014$ and $+0.010$ on the 60-month loans. Resolved by issue month, the difference is positive in all twelve months of 2016 under both backbones. The margins are smaller on these sub-populations than on the pooled holdout, where the loans of different terms and vintages are ranked together; the direction of the comparison and its materiality do not depend on the resolution filter.
+
+\paragraph{Source concentration: family cap and depth-0 controls}
+A subset drawn from few source tables invites the objection that any rule concentrating on the same tables would do as well: the pure LLM subsets on Stability 2024 are drawn entirely from \texttt{static\_0} under both budgets, and on Home Credit CatBoost 26 of the 40 features are bureau aggregates, whereas the classical leaders of those cases spread across six or seven source families (\ref{app:subsets}). The two diversity controls of Section~\ref{subsec:classical_fs} test it, and Table~\ref{tab:diversity} reports them. Capping the classical leader per source family lowers it in all six cases, by $0.009$ to $0.064$, so the cap binds; the capped selector remains below the LLM-assisted leader of its case by $0.021$ to $0.077$ in five of the six. On Home Credit logistic regression, the one case the classical selector wins, the cap erases that lead: mRMR falls from $0.7699$ to $0.7457$ against the LLM-assisted leader's $0.7489$, leaving the two families level within the bar. On Stability 2024 the sharper test is the depth-0 restriction, which confines the classical leader to the two static tables the semantic ranking chose from: it reaches $0.7748$ with logistic regression and $0.8209$ with CatBoost, against $0.8344$ and $0.8784$ for pure LLM over the same pool, a shortfall of $0.060$ and $0.058$. Source concentration alone therefore does not reproduce the Stability 2024 margins, and the semantic reading of those two cases stands with the control reported as the test it passed.
+
+\paragraph{Stability 2024 monthly breakdown}
+The Stability 2024 comparison was also resolved by month of decision over the nine months of its held-out window, February to October 2020. Pure LLM has the higher AUC in every one of the nine months under both backbones, by $+0.004$ to $+0.026$ against RFE CatBoost with logistic regression and by $+0.005$ to $+0.055$ against CatBoost SHAP with CatBoost, so the direction of the comparison does not depend on the period within the window. The window contains a sharp break in volume: 60,183 decisions were taken in February and 23,289 in April, a fall of 61 per cent that coincides with the onset of the COVID-19 pandemic (Section~\ref{subsec:cross_dataset}).
+
+\paragraph{Boruta budget attainment}
+The low held-out AUC of LLM then Boruta (Section~\ref{subsec:primary_results}) is not an artefact of short subsets: over the 108 fold and full-DEV refits of the three Boruta-based selectors (Boruta RF, IV then Boruta and LLM then Boruta; six cases, six partitions each) the Boruta stage reached its budget in 104, every full-DEV refit among them, and LLM then Boruta fell short only once, on Stability 2024 CatBoost fold 1 with 35 of 40 features; the other three below-budget cells are Boruta RF on Home Credit CatBoost fold 1 (26 of 40) and IV then Boruta on Home Credit CatBoost folds 1 and 2 (20 and 39 of 40).
+
+\paragraph{Effective dimension of the headline subsets}
+The budget counts original variables, not columns (Section~\ref{subsec:preprocessing}), so a subset that contains categorical variables delivers more than $\Kfeat$ columns to its model. Table~\ref{tab:dimension} gives $\Kfeat$ and the column count for the twelve headline subsets, after the full-DEV preprocessing map of each backbone. The widest input anywhere in the study is 174 columns, the CatBoost SHAP subset of Stability 2024 at $\Kfeat=40$, whose nine categorical variables carry the expansion; the LLM-assisted leader of that case receives 40. The LLM-assisted leader receives fewer columns than the classical leader in five of the six cases, by 5 to 134 columns, so in those five the margin is not obtained on a wider input matrix. Home Credit with CatBoost is the exception: the pure LLM subset carries five categorical variables, which expand to 37 of its 72 columns, against three in the RFE CatBoost wrapper, which expand to 13 of its 50. Its $+0.012$, the smallest of the five positive differences, is therefore obtained on the wider matrix of the two, and should be read with the native-categorical re-run reported above, where no expansion takes place and the same comparison stands at $+0.010$. One subset is budgeted on the expanded scale rather than the original one, the LLM then mRMR leader of LendingClub v2 with CatBoost (Section~\ref{subsec:preprocessing}): 13 of its 40 slots are one-hot indicators drawn from seven original variables, so it spans 34 original variables in 40 columns, against 40 original variables in 77 columns for its classical comparator, fewer on both scales. These counts change no leader, no difference and no interval; they are reported because $\Kfeat$ and the input width are not the same quantity and only the first is fixed by the design.
 
 \paragraph{Unmatched wall-clock times}
 Wall-clock times were not measured under matched conditions, with the one exception reported in Section~\ref{subsec:cost_runtime}, and support no scalability claim. On Home Credit logistic regression the pure LLM pipeline took 0.8 minutes against 12.1 minutes for full-pool mRMR (RF/correlation implementation) and 24.6 minutes for stable core plus LLM fill. On LendingClub CatBoost pure LLM was slower than mRMR: domain rules took 49.7 minutes, mRMR 65.3, LLM then mRMR 72.8, pure LLM 73.8, PCA 88.0, LLM then Boruta 110.5, Boruta 172.6 and stable core plus LLM fill 256.0 minutes, of which 176.6 minutes were feature selection; measured against the 49.7 minutes of the essentially selection-free domain-rules pipeline, it is the selection stage rather than model fitting that separates the pipelines, and the semantic call is negligible beside both. Runtimes were measured under unequal caching and execution conditions and are quoted here for Home Credit and LendingClub only.
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\begin{threeparttable}
+\caption{LendingClub v2 held-out comparison of Table~\ref{tab:primary_results} re-scored on sub-populations of the holdout, as row filters on the frozen HO prediction vectors with no refitting. The matured cohort is the 36-month loans issued 2016-01 to 2016-05, all of which had reached term before the 2019-05-01 snapshot, so the resolution filter of Section~\ref{subsec:dev_oot} cannot act on it; the two terms partition the holdout. $\Delta$AUC is the LLM-assisted leader minus the classical leader, read against the materiality bar of $0.010$ (Section~\ref{subsec:inference}).}
+\label{tab:lc_maturity}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Sub-population & $n$ & LR & CatBoost \\
+\midrule
+Matured cohort\tnote{a} & 123,898 & $+0.0183$ & $+0.0112$ \\
+Term 36 months & 232,361 & $+0.0215$ & $+0.0122$ \\
+Term 60 months & 60,744 & $+0.0141$ & $+0.0101$ \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}\footnotesize
+\item[a] Paired 95\% bootstrap intervals on the matured cohort: $[+0.0159,\,+0.0207]$ with logistic regression and $[+0.0099,\,+0.0126]$ with CatBoost. Every interval of every sub-population reported here and by issue month excludes zero; the full set, with the AUC of each leader, is in the repository.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\begin{table*}[htbp]
+\centering
+\footnotesize
+\begin{threeparttable}
+\caption{Diversity controls on the headline comparison (Section~\ref{subsec:primary_results}). \emph{Family cap} re-runs the HO-rule classical leader of each case with at most $\lceil \Kfeat/F\rceil$ features per source family; \emph{depth-0} restricts it to the depth-0 candidates of Stability 2024. Both are fitted on full DEV with the frozen backbones and scored once on HO. ``Uncapped'' is the classical leader's own HO AUC (Table~\ref{tab:primary_results}) and ``LLM-assisted'' its LLM-assisted counterpart in the same case; the last column is the control minus that counterpart, read against the materiality bar of $0.010$ (Section~\ref{subsec:inference}). The controls are not selectors of the comparison and appear in no family, leader or count.}
+\label{tab:diversity}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}llllrrrr@{}}
+\toprule
+Case & Rule & Base selector & $\Kfeat$ & Control & Uncapped & LLM-assisted & Difference \\
+\midrule
+Home Credit, LR & Family cap & mRMR & 20 & 0.7457 & 0.7699 & 0.7489 & $-0.003$\tnote{a} \\
+Home Credit, CatBoost & Family cap & RFE CatBoost & 40 & 0.7721 & 0.7814 & 0.7935 & $-0.021$ \\
+LendingClub v2, LR & Family cap & IV then Boruta & 20 & 0.6849 & 0.7098 & 0.7402 & $-0.055$ \\
+LendingClub v2, CatBoost & Family cap & IV then Boruta & 40 & 0.7065 & 0.7201 & 0.7707 & $-0.064$ \\
+Stability 2024, LR & Family cap & RFE CatBoost & 20 & 0.7579 & 0.8214 & 0.8344 & $-0.077$ \\
+Stability 2024, CatBoost & Family cap & CatBoost SHAP & 40 & 0.8314 & 0.8546 & 0.8784 & $-0.047$ \\
+\addlinespace
+Stability 2024, LR & Depth-0 & RFE CatBoost & 20 & 0.7748 & 0.8214 & 0.8344 & $-0.060$ \\
+Stability 2024, CatBoost & Depth-0 & CatBoost SHAP & 40 & 0.8209 & 0.8546 & 0.8784 & $-0.058$ \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}\footnotesize
+\item[a] The classical selector wins this case uncapped (0.7699); the cap removes that lead and leaves the two families level within the materiality bar.
+\end{tablenotes}
+\end{threeparttable}
+\end{table*}
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\begin{threeparttable}
+\caption{Effective dimension of the twelve headline subsets of Table~\ref{tab:primary_results}. ``Cat.'' is the number of the $\Kfeat$ selected original variables that are categorical; ``Columns'' is the number of columns the backbone receives after the full-DEV preprocessing map of Section~\ref{subsec:preprocessing}, with an explicit missing token per categorical and levels below the minimum frequency dropped (10 observations for Home Credit and Stability 2024, 50 for LendingClub v2). Subsets with no categorical variable receive exactly $\Kfeat$ columns.}
+\label{tab:dimension}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Selector & $\Kfeat$ & Cat. & Columns \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Home Credit, LR}} \\
+Stable core + LLM fill & 20 & 0 & 20 \\
+mRMR & 20 & 3 & 33 \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Home Credit, CatBoost}} \\
+Pure LLM & 40 & 5 & 72 \\
+RFE CatBoost & 40 & 3 & 50 \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{LendingClub v2, LR}} \\
+Pure LLM & 20 & 5 & 43 \\
+IV then Boruta & 20 & 5 & 48 \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{LendingClub v2, CatBoost}} \\
+LLM then mRMR\tnote{a} & 40 & 0 & 40 \\
+IV then Boruta & 40 & 7 & 77 \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Stability 2024, LR}} \\
+Pure LLM & 20 & 0 & 20 \\
+RFE CatBoost & 20 & 1 & 28 \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Stability 2024, CatBoost}} \\
+Pure LLM & 40 & 0 & 40 \\
+CatBoost SHAP & 40 & 9 & 174 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}\footnotesize
+\item[a] The only headline subset budgeted on the expanded scale (Section~\ref{subsec:preprocessing}): 13 of its 40 slots are one-hot indicators of seven original variables, so it spans 34 original variables. The LLM-assisted leader of each case is listed first.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
 
 \clearpage
 
@@ -1421,332 +1481,332 @@ During the preparation of this work the authors used Claude (Anthropic) to gener
 \sloppy\hbadness=10000
 \begin{thebibliography}{10}
 \expandafter\ifx\csname url\endcsname\relax
-  \def\url#1{\texttt{#1}}\fi
+ \def\url#1{\texttt{#1}}\fi
 \expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
 \expandafter\ifx\csname href\endcsname\relax
-  \def\href#1#2{#2} \def\path#1{#1}\fi
+ \def\href#1#2{#2} \def\path#1{#1}\fi
 
 \bibitem{thomas2002}
 L.~C. Thomas, D.~B. Edelman, J.~N. Crook, Credit Scoring and Its Applications,
-  SIAM, Philadelphia, 2002.
+ SIAM, Philadelphia, 2002.
 
 \bibitem{siddiqi2006}
 N.~Siddiqi, Credit Risk Scorecards: Developing and Implementing Intelligent
-  Credit Scoring, John Wiley \& Sons, Hoboken, NJ, 2006.
+ Credit Scoring, John Wiley \& Sons, Hoboken, NJ, 2006.
 
 \bibitem{lessmann2015}
 S.~Lessmann, B.~Baesens, H.-V. Seow, L.~C. Thomas, Benchmarking
-  state-of-the-art classification algorithms for credit scoring: An update of
-  research, Eur. J. Oper. Res. 247~(1) (2015) 124--136.
+ state-of-the-art classification algorithms for credit scoring: An update of
+ research, Eur. J. Oper. Res. 247~(1) (2015) 124--136.
 \newblock \href {https://doi.org/10.1016/j.ejor.2015.05.030}
-  {\path{doi:10.1016/j.ejor.2015.05.030}}.
+ {\path{doi:10.1016/j.ejor.2015.05.030}}.
 
 \bibitem{gunnarsson2021}
 B.~R. Gunnarsson, S.~vanden Broucke, B.~Baesens, M.~{\'O}skarsd{\'o}ttir,
-  W.~Lemahieu, Deep learning for credit scoring: Do or don't?, Eur. J. Oper. Res. 295~(1) (2021) 292--305.
+ W.~Lemahieu, Deep learning for credit scoring: Do or don't?, Eur. J. Oper. Res. 295~(1) (2021) 292--305.
 \newblock \href {https://doi.org/10.1016/j.ejor.2021.03.006}
-  {\path{doi:10.1016/j.ejor.2021.03.006}}.
+ {\path{doi:10.1016/j.ejor.2021.03.006}}.
 
 \bibitem{ballegeer2025}
 M.~Ballegeer, M.~Bogaert, D.~F. Benoit, Evaluating the stability of model
-  explanations in instance-dependent cost-sensitive credit scoring, Eur. J. Oper. Res. 326~(3) (2025) 630--640.
+ explanations in instance-dependent cost-sensitive credit scoring, Eur. J. Oper. Res. 326~(3) (2025) 630--640.
 \newblock \href {https://doi.org/10.1016/j.ejor.2025.05.041}
-  {\path{doi:10.1016/j.ejor.2025.05.041}}.
+ {\path{doi:10.1016/j.ejor.2025.05.041}}.
 
 \bibitem{guyon2003}
 I.~Guyon, A.~Elisseeff, An introduction to variable and feature selection,
-  J. Mach. Learn. Res. 3 (2003) 1157--1182.
+ J. Mach. Learn. Res. 3 (2003) 1157--1182.
 
 \bibitem{peng2005}
 H.~Peng, F.~Long, C.~Ding, Feature selection based on mutual information:
-  Criteria of max-dependency, max-relevance, and min-redundancy, IEEE Trans. Pattern Anal. Mach. Intell. 27~(8) (2005)
-  1226--1238.
+ Criteria of max-dependency, max-relevance, and min-redundancy, IEEE Trans. Pattern Anal. Mach. Intell. 27~(8) (2005)
+ 1226--1238.
 \newblock \href {https://doi.org/10.1109/TPAMI.2005.159}
-  {\path{doi:10.1109/TPAMI.2005.159}}.
+ {\path{doi:10.1109/TPAMI.2005.159}}.
 
 \bibitem{kohavi1997}
 R.~Kohavi, G.~H. John, Wrappers for feature subset selection, Artif. Intell. 97~(1--2) (1997) 273--324.
 \newblock \href {https://doi.org/10.1016/S0004-3702(97)00043-X}
-  {\path{doi:10.1016/S0004-3702(97)00043-X}}.
+ {\path{doi:10.1016/S0004-3702(97)00043-X}}.
 
 \bibitem{guyon2002}
 I.~Guyon, J.~Weston, S.~Barnhill, V.~Vapnik, Gene selection for cancer
-  classification using support vector machines, Mach. Learn. 46~(1--3)
-  (2002) 389--422.
+ classification using support vector machines, Mach. Learn. 46~(1--3)
+ (2002) 389--422.
 \newblock \href {https://doi.org/10.1023/A:1012487302797}
-  {\path{doi:10.1023/A:1012487302797}}.
+ {\path{doi:10.1023/A:1012487302797}}.
 
 \bibitem{kursa2010}
 M.~B. Kursa, W.~R. Rudnicki, Feature selection with the {B}oruta package,
-  J. Stat. Softw. 36~(11) (2010) 1--13.
+ J. Stat. Softw. 36~(11) (2010) 1--13.
 \newblock \href {https://doi.org/10.18637/jss.v036.i11}
-  {\path{doi:10.18637/jss.v036.i11}}.
+ {\path{doi:10.18637/jss.v036.i11}}.
 
 \bibitem{tibshirani1996}
 R.~Tibshirani, Regression shrinkage and selection via the lasso, J. R. Stat. Soc. Ser. B Methodol. 58~(1) (1996) 267--288.
 \newblock \href {https://doi.org/10.1111/j.2517-6161.1996.tb02080.x}
-  {\path{doi:10.1111/j.2517-6161.1996.tb02080.x}}.
+ {\path{doi:10.1111/j.2517-6161.1996.tb02080.x}}.
 
 \bibitem{lundberg2017}
 S.~M. Lundberg, S.-I. Lee, A unified approach to interpreting model
-  predictions, in: Advances in Neural Information Processing Systems 30, 2017,
-  pp. 4765--4774.
+ predictions, in: Advances in Neural Information Processing Systems 30, 2017,
+ pp. 4765--4774.
 
 \bibitem{choi2022}
 K.~Choi, C.~Cundy, S.~Srivastava, S.~Ermon, {LMPriors}: Pre-trained language
-  models as task-specific priors, arXiv preprint arXiv:2210.12530 (2022).
+ models as task-specific priors, arXiv preprint arXiv:2210.12530 (2022).
 \newblock \href {https://doi.org/10.48550/arXiv.2210.12530}
-  {\path{doi:10.48550/arXiv.2210.12530}}.
+ {\path{doi:10.48550/arXiv.2210.12530}}.
 
 \bibitem{jeong2025}
 D.~P. Jeong, Z.~C. Lipton, P.~Ravikumar, {LLM-Select}: Feature selection with
-  large language models, Trans. Mach. Learn. Res. (2025).
+ large language models, Trans. Mach. Learn. Res. (2025).
 
 \bibitem{li2025sigkdd}
 D.~Li, Z.~Tan, H.~Liu, Exploring large language models for feature selection: A
-  data-centric perspective, ACM SIGKDD Explor. Newsl. 26~(2) (2025)
-  44--53.
+ data-centric perspective, ACM SIGKDD Explor. Newsl. 26~(2) (2025)
+ 44--53.
 \newblock \href {https://doi.org/10.1145/3715073.3715077}
-  {\path{doi:10.1145/3715073.3715077}}.
+ {\path{doi:10.1145/3715073.3715077}}.
 
 \bibitem{zhang2025llmlasso}
 E.~Zhang, R.~Goto, N.~Sagan, J.~Mutter, N.~Phillips, A.~Alizadeh, K.~Lee,
-  J.~Blanchet, M.~Pilanci, R.~Tibshirani, {LLM-Lasso}: A robust framework for
-  domain-informed feature selection and regularization, arXiv preprint
-  arXiv:2502.10648 (2025).
+ J.~Blanchet, M.~Pilanci, R.~Tibshirani, {LLM-Lasso}: A robust framework for
+ domain-informed feature selection and regularization, arXiv preprint
+ arXiv:2502.10648 (2025).
 \newblock \href {https://doi.org/10.48550/arXiv.2502.10648}
-  {\path{doi:10.48550/arXiv.2502.10648}}.
+ {\path{doi:10.48550/arXiv.2502.10648}}.
 
 \bibitem{kalousis2007}
 A.~Kalousis, J.~Prados, M.~Hilario, Stability of feature selection algorithms:
-  a study on high-dimensional spaces, Knowl. Inf. Syst. 12~(1)
-  (2007) 95--116.
+ a study on high-dimensional spaces, Knowl. Inf. Syst. 12~(1)
+ (2007) 95--116.
 \newblock \href {https://doi.org/10.1007/s10115-006-0040-8}
-  {\path{doi:10.1007/s10115-006-0040-8}}.
+ {\path{doi:10.1007/s10115-006-0040-8}}.
 
 \bibitem{nogueira2018}
 S.~Nogueira, K.~Sechidis, G.~Brown, On the stability of feature selection
-  algorithms, J. Mach. Learn. Res. 18~(174) (2018) 1--54.
+ algorithms, J. Mach. Learn. Res. 18~(174) (2018) 1--54.
 
 \bibitem{homecredit2018}
 [dataset] {Home Credit Group},
-  \href{https://www.kaggle.com/competitions/home-credit-default-risk}{Home
-  {C}redit {D}efault {R}isk}, Kaggle competition dataset (2018).
+ \href{https://www.kaggle.com/competitions/home-credit-default-risk}{Home
+ {C}redit {D}efault {R}isk}, Kaggle competition dataset (2018).
 \newline\urlprefix\url{https://www.kaggle.com/competitions/home-credit-default-risk} (accessed 24 September 2026)
 
 \bibitem{lendingclub_kaggle}
 [dataset] N.~George,
-  \href{https://www.kaggle.com/datasets/wordsforthewise/lending-club}{All
-  {L}ending {C}lub loan data}, Kaggle dataset, version 3 (loans issued
-  2007--2018 Q4) (2019).
+ \href{https://www.kaggle.com/datasets/wordsforthewise/lending-club}{All
+ {L}ending {C}lub loan data}, Kaggle dataset, version 3 (loans issued
+ 2007--2018 Q4) (2019).
 \newline\urlprefix\url{https://www.kaggle.com/datasets/wordsforthewise/lending-club} (accessed 24 September 2026)
 
 \bibitem{homecredit2024}
 [dataset] {Home Credit Group},
-  \href{https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability}{Home
-  {C}redit -- {C}redit {R}isk {M}odel {S}tability}, Kaggle competition dataset
-  (2024).
+ \href{https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability}{Home
+ {C}redit -- {C}redit {R}isk {M}odel {S}tability}, Kaggle competition dataset
+ (2024).
 \newline\urlprefix\url{https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability} (accessed 24 September 2026)
 
 \bibitem{prokhorenkova2018}
 L.~Prokhorenkova, G.~Gusev, A.~Vorobev, A.~V. Dorogush, A.~Gulin, {CatBoost}:
-  unbiased boosting with categorical features, in: Advances in Neural
-  Information Processing Systems 31, 2018, pp. 6638--6648.
+ unbiased boosting with categorical features, in: Advances in Neural
+ Information Processing Systems 31, 2018, pp. 6638--6648.
 
 \bibitem{openai2025gpt41}
 {OpenAI}, \href{https://openai.com/index/gpt-4-1/}{Introducing {GPT-4.1} in the
-  {API}}, OpenAI product announcement, 14 April 2025 (2025).
+ {API}}, OpenAI product announcement, 14 April 2025 (2025).
 \newline\urlprefix\url{https://openai.com/index/gpt-4-1/} (accessed 24 September 2026)
 
 \bibitem{baesens2003}
 B.~Baesens, T.~Van~Gestel, S.~Viaene, M.~Stepanova, J.~Suykens, J.~Vanthienen,
-  Benchmarking state-of-the-art classification algorithms for credit scoring,
-  J. Oper. Res. Soc. 54~(6) (2003) 627--635.
+ Benchmarking state-of-the-art classification algorithms for credit scoring,
+ J. Oper. Res. Soc. 54~(6) (2003) 627--635.
 \newblock \href {https://doi.org/10.1057/palgrave.jors.2601545}
-  {\path{doi:10.1057/palgrave.jors.2601545}}.
+ {\path{doi:10.1057/palgrave.jors.2601545}}.
 
 \bibitem{maldonado2017}
 S.~Maldonado, C.~Bravo, J.~L{\'o}pez, J.~P{\'e}rez, Integrated framework for
-  profit-based feature selection and {SVM} classification in credit scoring,
-  Decis. Support Syst. 104 (2017) 113--121.
+ profit-based feature selection and {SVM} classification in credit scoring,
+ Decis. Support Syst. 104 (2017) 113--121.
 \newblock \href {https://doi.org/10.1016/j.dss.2017.10.007}
-  {\path{doi:10.1016/j.dss.2017.10.007}}.
+ {\path{doi:10.1016/j.dss.2017.10.007}}.
 
 \bibitem{breiman2001}
 L.~Breiman, Random forests, Mach. Learn. 45~(1) (2001) 5--32.
 \newblock \href {https://doi.org/10.1023/A:1010933404324}
-  {\path{doi:10.1023/A:1010933404324}}.
+ {\path{doi:10.1023/A:1010933404324}}.
 
 \bibitem{boloncanedo2015}
 V.~Bol{\'o}n-Canedo, N.~S{\'a}nchez-Maro{\~n}o, A.~Alonso-Betanzos, Recent
-  advances and emerging challenges of feature selection in the context of big
-  data, Knowl.-Based Syst. 86 (2015) 33--45.
+ advances and emerging challenges of feature selection in the context of big
+ data, Knowl.-Based Syst. 86 (2015) 33--45.
 \newblock \href {https://doi.org/10.1016/j.knosys.2015.05.014}
-  {\path{doi:10.1016/j.knosys.2015.05.014}}.
+ {\path{doi:10.1016/j.knosys.2015.05.014}}.
 
 \bibitem{kuncheva2007}
 L.~I. Kuncheva, A stability index for feature selection, in: Proceedings of the
-  25th IASTED International Multi-Conference: Artificial Intelligence and
-  Applications, Innsbruck, Austria, 2007, pp. 390--395.
+ 25th IASTED International Multi-Conference: Artificial Intelligence and
+ Applications, Innsbruck, Austria, 2007, pp. 390--395.
 
 \bibitem{saeys2008}
 Y.~Saeys, T.~Abeel, Y.~Van~de Peer, Robust feature selection using ensemble
-  feature selection techniques, in: Machine Learning and Knowledge Discovery in
-  Databases (ECML PKDD 2008), Lecture Notes in Computer Science 5212, 2008, pp.
-  313--325.
+ feature selection techniques, in: Machine Learning and Knowledge Discovery in
+ Databases (ECML PKDD 2008), Lecture Notes in Computer Science 5212, 2008, pp.
+ 313--325.
 \newblock \href {https://doi.org/10.1007/978-3-540-87481-2_21}
-  {\path{doi:10.1007/978-3-540-87481-2_21}}.
+ {\path{doi:10.1007/978-3-540-87481-2_21}}.
 
 \bibitem{dwork2001}
 C.~Dwork, R.~Kumar, M.~Naor, D.~Sivakumar, Rank aggregation methods for the
-  {W}eb, in: Proceedings of the 10th International Conference on World Wide Web
-  (WWW 2001), 2001, pp. 613--622.
+ {W}eb, in: Proceedings of the 10th International Conference on World Wide Web
+ (WWW 2001), 2001, pp. 613--622.
 \newblock \href {https://doi.org/10.1145/371920.372165}
-  {\path{doi:10.1145/371920.372165}}.
+ {\path{doi:10.1145/371920.372165}}.
 
 \bibitem{cawley2010}
 G.~C. Cawley, N.~L.~C. Talbot, On over-fitting in model selection and subsequent
-  selection bias in performance evaluation, J. Mach. Learn. Res.
-  11 (2010) 2079--2107.
+ selection bias in performance evaluation, J. Mach. Learn. Res.
+ 11 (2010) 2079--2107.
 
 \bibitem{jelizarow2010}
 M.~Jelizarow, V.~Guillemot, A.~Tenenhaus, K.~Strimmer, A.-L. Boulesteix,
-  Over-optimism in bioinformatics: an illustration, Bioinformatics 26~(16)
-  (2010) 1990--1998.
+ Over-optimism in bioinformatics: an illustration, Bioinformatics 26~(16)
+ (2010) 1990--1998.
 \newblock \href {https://doi.org/10.1093/bioinformatics/btq323}
-  {\path{doi:10.1093/bioinformatics/btq323}}.
+ {\path{doi:10.1093/bioinformatics/btq323}}.
 
 \bibitem{berk2013}
 R.~Berk, L.~Brown, A.~Buja, K.~Zhang, L.~Zhao, Valid post-selection inference,
-  Ann. Stat. 41~(2) (2013) 802--837.
+ Ann. Stat. 41~(2) (2013) 802--837.
 \newblock \href {https://doi.org/10.1214/12-AOS1077}
-  {\path{doi:10.1214/12-AOS1077}}.
+ {\path{doi:10.1214/12-AOS1077}}.
 
 \bibitem{taylor2015}
 J.~Taylor, R.~J. Tibshirani, Statistical learning and selective inference,
-  Proc. Natl. Acad. Sci. U.S.A. 112~(25) (2015) 7629--7634.
+ Proc. Natl. Acad. Sci. U.S.A. 112~(25) (2015) 7629--7634.
 \newblock \href {https://doi.org/10.1073/pnas.1507583112}
-  {\path{doi:10.1073/pnas.1507583112}}.
+ {\path{doi:10.1073/pnas.1507583112}}.
 
 \bibitem{sanzguerrero2025}
 M.~Sanz-Guerrero, J.~Arroyo, Credit risk meets large language models: Building
-  a risk indicator from loan descriptions in {P2P} lending, Intel. Artif. 28~(75) (2025) 220--247.
+ a risk indicator from loan descriptions in {P2P} lending, Intel. Artif. 28~(75) (2025) 220--247.
 \newblock \href {https://doi.org/10.4114/intartif.vol28iss75pp220-247}
-  {\path{doi:10.4114/intartif.vol28iss75pp220-247}}.
+ {\path{doi:10.4114/intartif.vol28iss75pp220-247}}.
 
 \bibitem{xia2025}
 Y.~Xia, Z.~Han, Y.~Li, L.~He, Credit scoring model for fintech lending: An
-  integration of large language models and {FocalPoly} loss, Int. J. Forecast. 41~(3) (2025) 894--919.
+ integration of large language models and {FocalPoly} loss, Int. J. Forecast. 41~(3) (2025) 894--919.
 \newblock \href {https://doi.org/10.1016/j.ijforecast.2024.07.005}
-  {\path{doi:10.1016/j.ijforecast.2024.07.005}}.
+ {\path{doi:10.1016/j.ijforecast.2024.07.005}}.
 
 \bibitem{hollmann2023caafe}
 N.~Hollmann, S.~M{\"u}ller, F.~Hutter, Large language models for automated data
-  science: Introducing {CAAFE} for context-aware automated feature engineering,
-  in: Advances in Neural Information Processing Systems 36, 2023, pp.
-  44753--44775.
+ science: Introducing {CAAFE} for context-aware automated feature engineering,
+ in: Advances in Neural Information Processing Systems 36, 2023, pp.
+ 44753--44775.
 
 \bibitem{han2024llmfe}
 S.~Han, J.~Yoon, S.~{\"O}. Arik, T.~Pfister, Large language models can
-  automatically engineer features for few-shot tabular learning, in: Proceedings
-  of the 41st International Conference on Machine Learning, PMLR 235, 2024, pp.
-  17454--17479.
+ automatically engineer features for few-shot tabular learning, in: Proceedings
+ of the 41st International Conference on Machine Learning, PMLR 235, 2024, pp.
+ 17454--17479.
 
 \bibitem{nam2024octree}
 J.~Nam, K.~Kim, S.~Oh, J.~Tack, J.~Kim, J.~Shin, Optimized feature generation
-  for tabular data via {LLMs} with decision tree reasoning, in: Advances in
-  Neural Information Processing Systems 37, 2024, pp. 92352--92380.
+ for tabular data via {LLMs} with decision tree reasoning, in: Advances in
+ Neural Information Processing Systems 37, 2024, pp. 92352--92380.
 
 \bibitem{hegselmann2023tabllm}
 S.~Hegselmann, A.~Buendia, H.~Lang, M.~Agrawal, X.~Jiang, D.~Sontag, {TabLLM}:
-  Few-shot classification of tabular data with large language models, in:
-  Proceedings of the 26th International Conference on Artificial Intelligence
-  and Statistics (AISTATS), PMLR 206, 2023, pp. 5549--5581.
+ Few-shot classification of tabular data with large language models, in:
+ Proceedings of the 26th International Conference on Artificial Intelligence
+ and Statistics (AISTATS), PMLR 206, 2023, pp. 5549--5581.
 
 \bibitem{bergmeir2012}
 C.~Bergmeir, J.~M. Ben{\'\i}tez, On the use of cross-validation for time series
-  predictor evaluation, Inf. Sci. 191 (2012) 192--213.
+ predictor evaluation, Inf. Sci. 191 (2012) 192--213.
 \newblock \href {https://doi.org/10.1016/j.ins.2011.12.028}
-  {\path{doi:10.1016/j.ins.2011.12.028}}.
+ {\path{doi:10.1016/j.ins.2011.12.028}}.
 
 \bibitem{gama2014}
 J.~Gama, I.~{\v{Z}}liobait{\.e}, A.~Bifet, M.~Pechenizkiy, A.~Bouchachia, A
-  survey on concept drift adaptation, ACM Comput. Surv. 46~(4) (2014) 44.
+ survey on concept drift adaptation, ACM Comput. Surv. 46~(4) (2014) 44.
 \newblock \href {https://doi.org/10.1145/2523813} {\path{doi:10.1145/2523813}}.
 
 \bibitem{yurdakul2020}
 B.~Yurdakul, J.~Naranjo, Statistical properties of the population stability
-  index, J. Risk Model Valid. 14 (2020) 89--100.
+ index, J. Risk Model Valid. 14 (2020) 89--100.
 \newblock \href {https://doi.org/10.21314/JRMV.2020.227}
-  {\path{doi:10.21314/JRMV.2020.227}}.
+ {\path{doi:10.21314/JRMV.2020.227}}.
 
 \bibitem{kraskov2004}
 A.~Kraskov, H.~St{\"o}gbauer, P.~Grassberger, Estimating mutual information,
-  Phys. Rev. E 69~(6) (2004) 066138.
+ Phys. Rev. E 69~(6) (2004) 066138.
 \newblock \href {https://doi.org/10.1103/PhysRevE.69.066138}
-  {\path{doi:10.1103/PhysRevE.69.066138}}.
+ {\path{doi:10.1103/PhysRevE.69.066138}}.
 
 \bibitem{ross2014}
 B.~C. Ross, Mutual information between discrete and continuous data sets, PLoS
-  ONE 9~(2) (2014) e87357.
+ ONE 9~(2) (2014) e87357.
 \newblock \href {https://doi.org/10.1371/journal.pone.0087357}
-  {\path{doi:10.1371/journal.pone.0087357}}.
+ {\path{doi:10.1371/journal.pone.0087357}}.
 
 \bibitem{jolliffe2016}
 I.~T. Jolliffe, J.~Cadima, Principal component analysis: a review and recent
-  developments, Philos. Trans. R. Soc. A 374~(2065)
-  (2016) 20150202.
+ developments, Philos. Trans. R. Soc. A 374~(2065)
+ (2016) 20150202.
 \newblock \href {https://doi.org/10.1098/rsta.2015.0202}
-  {\path{doi:10.1098/rsta.2015.0202}}.
+ {\path{doi:10.1098/rsta.2015.0202}}.
 
 \bibitem{jaccard1901}
 P.~Jaccard, {\'E}tude comparative de la distribution florale dans une portion
-  des {A}lpes et des {J}ura, Bull. Soc. Vaud. Sci. Nat. 37 (1901) 547--579.
+ des {A}lpes et des {J}ura, Bull. Soc. Vaud. Sci. Nat. 37 (1901) 547--579.
 \newblock \href {https://doi.org/10.5169/seals-266450}
-  {\path{doi:10.5169/seals-266450}}.
+ {\path{doi:10.5169/seals-266450}}.
 
 \bibitem{pedregosa2011}
 F.~Pedregosa, G.~Varoquaux, A.~Gramfort, V.~Michel, B.~Thirion, O.~Grisel,
-  M.~Blondel, P.~Prettenhofer, R.~Weiss, V.~Dubourg, J.~Vanderplas, A.~Passos,
-  D.~Cournapeau, M.~Brucher, M.~Perrot, {\'E}.~Duchesnay, Scikit-learn: Machine
-  learning in {P}ython, J. Mach. Learn. Res. 12 (2011)
-  2825--2830.
+ M.~Blondel, P.~Prettenhofer, R.~Weiss, V.~Dubourg, J.~Vanderplas, A.~Passos,
+ D.~Cournapeau, M.~Brucher, M.~Perrot, {\'E}.~Duchesnay, Scikit-learn: Machine
+ learning in {P}ython, J. Mach. Learn. Res. 12 (2011)
+ 2825--2830.
 
 \bibitem{hanley1982}
 J.~A. Hanley, B.~J. McNeil, The meaning and use of the area under a receiver
-  operating characteristic ({ROC}) curve, Radiology 143~(1) (1982) 29--36.
+ operating characteristic ({ROC}) curve, Radiology 143~(1) (1982) 29--36.
 \newblock \href {https://doi.org/10.1148/radiology.143.1.7063747}
-  {\path{doi:10.1148/radiology.143.1.7063747}}.
+ {\path{doi:10.1148/radiology.143.1.7063747}}.
 
 \bibitem{youden1950}
 W.~J. Youden, Index for rating diagnostic tests, Cancer 3~(1) (1950) 32--35.
 \newblock \href
-  {https://doi.org/10.1002/1097-0142(1950)3:1<32::AID-CNCR2820030106>3.0.CO;2-3}
-  {\path{doi:10.1002/1097-0142(1950)3:1<32::AID-CNCR2820030106>3.0.CO;2-3}}.
+ {https://doi.org/10.1002/1097-0142(1950)3:1<32::AID-CNCR2820030106>3.0.CO;2-3}
+ {\path{doi:10.1002/1097-0142(1950)3:1<32::AID-CNCR2820030106>3.0.CO;2-3}}.
 
 \bibitem{brier1950}
 G.~W. Brier, Verification of forecasts expressed in terms of probability,
-  Mon. Weather Rev. 78~(1) (1950) 1--3.
+ Mon. Weather Rev. 78~(1) (1950) 1--3.
 \newblock \href
-  {https://doi.org/10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2}
-  {\path{doi:10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2}}.
+ {https://doi.org/10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2}
+ {\path{doi:10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2}}.
 
 \bibitem{delong1988}
 E.~R. DeLong, D.~M. DeLong, D.~L. Clarke-Pearson, Comparing the areas under two
-  or more correlated receiver operating characteristic curves: A nonparametric
-  approach, Biometrics 44~(3) (1988) 837--845.
+ or more correlated receiver operating characteristic curves: A nonparametric
+ approach, Biometrics 44~(3) (1988) 837--845.
 \newblock \href {https://doi.org/10.2307/2531595} {\path{doi:10.2307/2531595}}.
 
 \bibitem{efron1993}
 B.~Efron, R.~J. Tibshirani, An Introduction to the Bootstrap, Chapman \& Hall,
-  New York, 1993.
+ New York, 1993.
 
 \bibitem{holm1979}
 S.~Holm, A simple sequentially rejective multiple test procedure, Scand. J. Stat. 6~(2) (1979) 65--70.
 
 \bibitem{demsar2006}
 J.~Dem{\v{s}}ar, Statistical comparisons of classifiers over multiple data
-  sets, J. Mach. Learn. Res. 7 (2006) 1--30.
+ sets, J. Mach. Learn. Res. 7 (2006) 1--30.
 
 \end{thebibliography}
 \endgroup
