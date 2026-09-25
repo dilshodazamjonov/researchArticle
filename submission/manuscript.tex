@@ -396,7 +396,7 @@ Revision reported in this paper & A contrastive-representation selector, its tra
 \subsection{Datasets}
 \label{subsec:datasets}
 
-Three public credit datasets released through Kaggle are used (Table~\ref{tab:datasets}). \emph{Home Credit} is the Home Credit Default Risk data \cite{homecredit2018}: the unit is a loan application, the event is the provider's binary target (payment difficulties), and the universe contains 529 original features derived from the application record and the auxiliary tables. Its ordering index is \texttt{DAYS\_DECISION}, the number of days between the applicant's most recent previous application and the current application, so the split is a recency-based covariate-shift holdout rather than a calendar-time split of the current applications. DEV holds applicants whose most recent previous application is 241 to 600 days old and HO those with a more recent one. Features that are functions of this index, the previous-application decision days and their aggregates, are not in the candidate set of any selector, so no selector could learn on a range of the index that HO does not contain. Applications without a previous application within the 600-day window, about 29\% of the 307,511 applications in the public release, are excluded, which limits the population to which the Home Credit results apply. Every selector, classical and LLM-assisted, selects from the 373 features that pass the 90\% missingness screen on the earliest training fold; the budget of 20 or 40 features is the same for all.
+Three public credit datasets released through Kaggle are used (Table~\ref{tab:datasets}), and Figure~\ref{fig:scale} shows the scale of the selection problem in each: the decisions on which every supervised selector is refitted, the engineered universe, the screened candidate set, the semantic pool and the budget. \emph{Home Credit} is the Home Credit Default Risk data \cite{homecredit2018}: the unit is a loan application, the event is the provider's binary target (payment difficulties), and the universe contains 529 original features derived from the application record and the auxiliary tables. Its ordering index is \texttt{DAYS\_DECISION}, the number of days between the applicant's most recent previous application and the current application, so the split is a recency-based covariate-shift holdout rather than a calendar-time split of the current applications. DEV holds applicants whose most recent previous application is 241 to 600 days old and HO those with a more recent one. Features that are functions of this index, the previous-application decision days and their aggregates, are not in the candidate set of any selector, so no selector could learn on a range of the index that HO does not contain. Applications without a previous application within the 600-day window, about 29\% of the 307,511 applications in the public release, are excluded, which limits the population to which the Home Credit results apply. Every selector, classical and LLM-assisted, selects from the 373 features that pass the 90\% missingness screen on the earliest training fold; the budget of 20 or 40 features is the same for all.
 
 \emph{LendingClub v2} is the LendingClub loan book \cite{lendingclub_kaggle}: only resolved 36- and 60-month loans through the 2019-05-01 snapshot are retained, with charged-off or defaulted loans as events and fully paid loans as non-events. The 675 features were generated deterministically from roughly 93 distinct columns of the loan book, and every one of them is an attribute of a single loan and its applicant at origination: 116 raw columns carried through unchanged, 180 binary flags, 158 ratios, 88 missing indicators, 78 further engineered variables, 27 binned versions, 19 interactions and 9 categoricals. No feature aggregates across loans or over calendar periods, and the only elapsed-time quantity is the age of the credit file at issue, the number of months between \texttt{issue\_\allowbreak d} and \texttt{earliest\_\allowbreak cr\_\allowbreak line}, which is an attribute of the loan rather than a time index. A prediction-time availability review removed two groups of source columns before any feature was built. The first is every post-origination field, among them \texttt{total\_\allowbreak pymnt}, \texttt{recoveries}, \texttt{last\_\allowbreak pymnt\_\allowbreak amnt}, \texttt{out\_\allowbreak prncp}, the \texttt{last\_\allowbreak fico\_\allowbreak range} fields, \texttt{hardship\_\allowbreak flag} and \texttt{debt\_\allowbreak settlement\_\allowbreak flag}, which record what happened after the credit decision and would reveal the outcome. The second is LendingClub's own pricing and grading fields, \texttt{int\_\allowbreak rate}, \texttt{grade}, \texttt{sub\_\allowbreak grade}, \texttt{installment} and \texttt{funded\_\allowbreak amnt}, which encode the platform's own assessment of the application: excluding them poses the selection problem over applicant and bureau attributes rather than over a re-encoding of a credit decision already taken, at the cost that the AUC levels reported here are not comparable with LendingClub studies that retain the platform's grade or interest rate. Several credit-file attributes of the loan book were introduced by the platform during the sample period, so their missingness is higher in DEV than in HO, and the features derived from them inherit that pattern; the highest missingness rate reached by any LendingClub feature on the earliest training partition is 82\%, so the screen that defines the candidate set retains all 675; 566 features fall below 40\%, two lie between 40 and 60\% and 107 between 60 and 82\%. None of them appears anywhere in the cached semantic rankings, so no LLM-assisted subset contains one; the target-aware selectors compute their criteria on the DEV training partition, where a field that is sparse in that period carries little information value, mutual information or model importance and is down-weighted by construction. Both the language model and the classical selectors select from the same 675 features. The ordering index is the number of days from the issue month to the last finalised issue month, 2018-12-01, so the HO window is later in calendar time. DEV comprises the loans issued from January 2014 to December 2015 and HO the loans issued in 2016. Thirty-six-month loans account for 445,596 of the 598,649 DEV loans and 232,361 of the 293,105 HO loans, with event rates of 14.5\% (36-month) and 34.3\% (60-month) in DEV and 19.8\% and 36.4\% in HO, so the DEV--HO difference in event rate arises within both terms and not only from a change in term mix.
 
@@ -429,6 +429,41 @@ Candidate set, all selectors & 373 of 529 ($\le$90\% missing) & 675 of 675 ($\le
 \end{tablenotes}
 \end{threeparttable}
 \end{table*}
+
+\begin{figure*}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    paper,
+    xbar, bar width=4.4pt,
+    scale only axis, width=10.2cm, height=6.6cm,
+    xmode=log, log basis x=10, xmin=1, xmax=4e7,
+    xtick={10,100,1000,10000,100000,1000000},
+    xticklabels={10,100,{1,000},{10,000},{100,000},{1,000,000}},
+    xmajorgrids, axis lines=left, clip=false,
+    xlabel={Count, logarithmic scale},
+    symbolic y coords={bLR,bCB,pLR,pCB,cand,univ,dev},
+    ytick={bLR,bCB,pLR,pCB,cand,univ,dev},
+    yticklabels={{Budget, LR ($\Kfeat=20$)},{Budget, CatBoost ($\Kfeat=40$)},{Semantic pool, LR},{Semantic pool, CatBoost},{Screened candidate set},{Engineered universe},{DEV decisions}},
+    enlarge y limits=0.1,
+    legend style={at={(0.985,0.03)}, anchor=south east, legend columns=1, cells={anchor=west}},
+    reverse legend,
+    nodes near coords, point meta=explicit symbolic,
+    every node near coord/.append style={font=\scriptsize, anchor=west, xshift=1pt},
+]
+\addplot[fill=cGrey, draw=cGrey!70!black, bar shift=0pt] coordinates {(20,bLR) [20] (40,bCB) [40] (60,pLR) [60] (100,pCB) [100]};
+\addlegendentry{Same in all three datasets}
+\addplot[fill=cGreen, draw=cGreen!70!black, bar shift=-6.2pt] coordinates {(1068,cand) [1{,}068] (1959,univ) [1{,}959] (1157512,dev) [1{,}157{,}512]};
+\addlegendentry{Stability 2024}
+\addplot[fill=cOrange, draw=cOrange!70!black, bar shift=0pt] coordinates {(675,cand) [675] (675,univ) [675] (598649,dev) [598{,}649]};
+\addlegendentry{LendingClub v2}
+\addplot[fill=cBlue, draw=cBlue!70!black, bar shift=6.2pt] coordinates {(373,cand) [373] (529,univ) [529] (99092,dev) [99{,}092]};
+\addlegendentry{Home Credit}
+\end{axis}
+\end{tikzpicture}
+\caption{Scale of the selection problem. For each dataset: the development (DEV) decisions on which every supervised selector is refitted; the engineered universe; the screened candidate set offered to every selector, classical and LLM-assisted (features with at most 90\% missing values on the earliest training partition); the semantic pool that the hybrid pipelines hand to their statistical stage (60 names for logistic regression, 100 for CatBoost); and the budget of the final subset ($\Kfeat=20$ and $\Kfeat=40$). The pool and the budget are the same in all three datasets. Logarithmic axis. Plot code generated with AI assistance (see the declaration on generative AI).}
+\label{fig:scale}
+\end{figure*}
 
 \subsection{Held-Out DEV/HO Design}
 \label{subsec:dev_oot}
