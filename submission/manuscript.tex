@@ -42,7 +42,7 @@
 % float pages, it restores the page height but not the first column's text height, so the next page's left column
 % stops after a few lines. Restore the full height there.
 \patchcmd{\@doclearpage}{\global \@colht \textheight}{\global \@colht \textheight \global \@colroom \textheight}{}%
- {\PackageWarningNoLine{manuscript}{Patch of \string\@doclearpage\space failed}}
+  {\PackageWarningNoLine{manuscript}{Patch of \string\@doclearpage\space failed}}
 \makeatother
 \usepackage{threeparttable}
 \usepackage{tikz}
@@ -77,15 +77,15 @@
 \definecolor{cRed}{HTML}{D55E00}
 \definecolor{cGrey}{HTML}{8C8C8C}
 \pgfplotsset{
- paper/.style={
-  axis line style={gray!60},
-  tick style={gray!60},
-  tick label style={font=\footnotesize},
-  label style={font=\footnotesize},
-  title style={font=\footnotesize\bfseries},
-  grid style={gray!18},
-  legend style={font=\footnotesize, draw=none, fill=none},
-  scaled ticks=false,
+  paper/.style={
+    axis line style={gray!60},
+    tick style={gray!60},
+    tick label style={font=\footnotesize},
+    label style={font=\footnotesize},
+    title style={font=\footnotesize\bfseries},
+    grid style={gray!18},
+    legend style={font=\footnotesize, draw=none, fill=none},
+    scaled ticks=false,
  }
 }
 
@@ -192,14 +192,14 @@ A retail credit model estimates the probability of a defined adverse event withi
 
 Let $X_1,\dots,X_d$ denote candidate features and $Y\in\{0,1\}$ the event indicator. \emph{Filters} score features by statistics computed from data alone. The information value (IV) of scorecard practice bins a feature and compares the shares $g_b$ and $e_b$ of non-events and events in bin $b$ through the weight of evidence (WOE) \cite{siddiqi2006},
 \begin{equation}
-  \mathrm{WOE}_b=\ln\frac{g_b}{e_b},\qquad
-  \mathrm{IV}=\sum_{b}(g_b-e_b)\,\mathrm{WOE}_b .
-  \label{eq:iv}
+    \mathrm{WOE}_b=\ln\frac{g_b}{e_b},\qquad
+    \mathrm{IV}=\sum_{b}(g_b-e_b)\,\mathrm{WOE}_b .
+    \label{eq:iv}
 \end{equation}
 Mutual information $I(X_j;Y)$ is the general-purpose relevance statistic, and mRMR \cite{peng2005} adds greedily the feature that maximises relevance minus its average redundancy with the already selected set $S$,
 \begin{equation}
-  j^{\star}=\arg\max_{j\notin S}\Big[\,I(X_j;Y)-\frac{1}{|S|}\sum_{k\in S} I(X_j;X_k)\Big],
-  \label{eq:mrmr}
+    j^{\star}=\arg\max_{j\notin S}\Big[\,I(X_j;Y)-\frac{1}{|S|}\sum_{k\in S} I(X_j;X_k)\Big],
+    \label{eq:mrmr}
 \end{equation}
 with mutual information estimated by nearest-neighbour estimators \cite{kraskov2004,ross2014}: the estimator of Kraskov et al.\ between continuous variables and that of Ross between a continuous feature and the binary target. Principal component analysis is unsupervised but replaces variables by orthogonal combinations rather than selecting them \cite{jolliffe2016}. \emph{Wrappers} evaluate subsets with a learning algorithm, here recursive feature elimination \cite{guyon2002} and Boruta \cite{kursa2010,breiman2001}, and \emph{embedded} methods derive relevance from the fitted model, here through SHAP attributions \cite{lundberg2017}, with sparsity penalties \cite{tibshirani1996} the classical alternative; their implementations are specified in Section~\ref{subsec:classical_fs}. Because wrappers and embedded methods use the target, they must be fitted strictly inside development folds.
 
@@ -225,11 +225,11 @@ Selection stability is the degree to which a selector returns the same subset wh
 
 Figure~\ref{fig:pipeline} summarises the pipeline, which is executed in the same order for every dataset.
 \begin{enumerate}
-  \item \textbf{Assembly and outcome definition.} The engineered universe is assembled (529 predictors for Home Credit, 675 for LendingClub, 1,959 for Stability 2024) and the event definition of Section~\ref{subsec:datasets} applied; for Stability 2024 a prediction-time availability review of 461 source variables approved 434 raw predictors, and on LendingClub the same kind of review removed every post-origination field and the platform's own pricing and grading fields before the 675 features were built from roughly 93 source columns (Section~\ref{subsec:datasets}).
-  \item \textbf{Split and folds.} Each dataset is split along its ordering index, calendar time for LendingClub and Stability 2024 and prior-application recency for Home Credit, into a development population (DEV) and a held-out population (HO), and DEV is divided into five expanding-window folds along the same index, with one index unit omitted between training and validation partitions (same-date decisions stay together in Stability 2024).
-  \item \textbf{Candidate universe and preprocessing.} Every selector, classical and LLM-assisted, works from the same candidate set: the features of the engineered universe with at most 90\% missing values on the training partition of the earliest fold, a screen computed once per dataset, held fixed across the folds and using no outcomes. It retains 373 of the 529 Home Credit features, all 675 LendingClub features, none of which exceeds the threshold, and 1,068 of the 1,959 Stability 2024 features. The information-value interval of $0.01\le\mathrm{IV}\le0.50$ is used within the IV/WOE ranker and as the screening stage of IV then Boruta; the upper bound, the conventional leakage warning of scorecard practice, removed nothing, because no feature of any of the three universes reaches an information value of 0.50 on the earliest training partition. Preprocessing maps are fitted on the training partition of each fold.
-  \item \textbf{Feature selection.} The thirteen strategies of Sections~\ref{subsec:classical_fs}--\ref{subsec:hybrid_fs} (Table~\ref{tab:methods}), and the classical voting family of \ref{app:voting}, produce a subset of $\Kfeat=20$ (logistic regression) or $\Kfeat=40$ (CatBoost) original features; target-free rankings use no outcome; the semantic ranking is requested separately for each fold partition on Home Credit and LendingClub, and one ranking served every fold on Stability 2024 (Section~\ref{subsec:llm_fs}); target-aware selectors are fitted per fold.
-  \item \textbf{Model fitting and validation.} The fixed configurations of Section~\ref{subsec:models} are fitted on the subset; fold validation yields discrimination estimates and the five fold-level subsets used for stability.
+    \item \textbf{Assembly and outcome definition.} The engineered universe is assembled (529 predictors for Home Credit, 675 for LendingClub, 1,959 for Stability 2024) and the event definition of Section~\ref{subsec:datasets} applied; for Stability 2024 a prediction-time availability review of 461 source variables approved 434 raw predictors, and on LendingClub the same kind of review removed every post-origination field and the platform's own pricing and grading fields before the 675 features were built from roughly 93 source columns (Section~\ref{subsec:datasets}).
+    \item \textbf{Split and folds.} Each dataset is split along its ordering index, calendar time for LendingClub and Stability 2024 and prior-application recency for Home Credit, into a development population (DEV) and a held-out population (HO), and DEV is divided into five expanding-window folds along the same index, with one index unit omitted between training and validation partitions (same-date decisions stay together in Stability 2024).
+    \item \textbf{Candidate universe and preprocessing.} Every selector, classical and LLM-assisted, works from the same candidate set: the features of the engineered universe with at most 90\% missing values on the training partition of the earliest fold, a screen computed once per dataset, held fixed across the folds and using no outcomes. It retains 373 of the 529 Home Credit features, all 675 LendingClub features, none of which exceeds the threshold, and 1,068 of the 1,959 Stability 2024 features. The information-value interval of $0.01\le\mathrm{IV}\le0.50$ is used within the IV/WOE ranker and as the screening stage of IV then Boruta; the upper bound, the conventional leakage warning of scorecard practice, removed nothing, because no feature of any of the three universes reaches an information value of 0.50 on the earliest training partition. Preprocessing maps are fitted on the training partition of each fold.
+    \item \textbf{Feature selection.} The thirteen strategies of Sections~\ref{subsec:classical_fs}--\ref{subsec:hybrid_fs} (Table~\ref{tab:methods}), and the classical voting family of \ref{app:voting}, produce a subset of $\Kfeat=20$ (logistic regression) or $\Kfeat=40$ (CatBoost) original features; target-free rankings use no outcome; the semantic ranking is requested separately for each fold partition on Home Credit and LendingClub, and one ranking served every fold on Stability 2024 (Section~\ref{subsec:llm_fs}); target-aware selectors are fitted per fold.
+    \item \textbf{Model fitting and validation.} The fixed configurations of Section~\ref{subsec:models} are fitted on the subset; fold validation yields discrimination estimates and the five fold-level subsets used for stability.
   \item \textbf{Freeze and HO scoring.} Everything is refitted on full DEV; rankings, subsets and settings are recorded in a hash-bound manifest; the frozen pipeline then scores the HO population, and no retuning of that pipeline follows within the protocol version (changes between versions are summarised in Section~\ref{subsec:protocol_development} and recorded in \ref{app:protocol}, Table~\ref{tab:stages}).
 \end{enumerate}
 The LLM ranking is target-free: the model receives feature definitions and lineage only, and no outcomes, validation statistics or HO information; domain rules, Random~$\Kfeat$, principal components and the missingness screen that defines the candidate set are also target-free. Information value, mRMR, Boruta, recursive elimination, SHAP ranking, the stable-core construction and model fitting are target-aware and confined to DEV training partitions. Leakage controls thus operate at three levels: HO exclusion from every fitting, selection and ranking step, fold-local fitting of every target-aware component, and hash-bound freezing of every artefact before each final HO scoring run.
@@ -237,14 +237,14 @@ The LLM ranking is target-free: the model receives feature definitions and linea
 \begin{figure*}[htbp]
 \centering
 \begin{tikzpicture}[
-  font=\scriptsize,
-  box/.style={draw=gray!60, rounded corners=2pt, align=flush center, inner sep=3pt, minimum height=8mm, fill=white},
-  tfree/.style={box, fill=gray!14},
-  taware/.style={box, fill=cBlue!12, draw=cBlue!60!black},
-  oot/.style={box, fill=cOrange!25, draw=cOrange!80!black},
-  arr/.style={-{Latex[length=1.8mm]}, semithick, gray!50!black},
-  darr/.style={-{Latex[length=1.8mm]}, semithick, dashed, cOrange!80!black},
-  node distance=5mm and 4mm
+    font=\scriptsize,
+    box/.style={draw=gray!60, rounded corners=2pt, align=flush center, inner sep=3pt, minimum height=8mm, fill=white},
+    tfree/.style={box, fill=gray!14},
+    taware/.style={box, fill=cBlue!12, draw=cBlue!60!black},
+    oot/.style={box, fill=cOrange!25, draw=cOrange!80!black},
+    arr/.style={-{Latex[length=1.8mm]}, semithick, gray!50!black},
+    darr/.style={-{Latex[length=1.8mm]}, semithick, dashed, cOrange!80!black},
+    node distance=5mm and 4mm
 ]
 \node[box, text width=44mm] (data) {Engineered feature universe\\and outcome definition};
 \node[box, text width=44mm, right=of data] (split) {Split by ordering index\\(calendar time; for Home Credit,\\prior-application recency)\\DEV, then HO population};
@@ -401,13 +401,13 @@ Candidate set, all selectors & 373 of 529 ($\le$90\% missing) & 675 of 675 ($\le
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-  paper,
+    paper,
   xbar, bar width=4.4pt,
   scale only axis, width=10.2cm, height=6.6cm,
   xmode=log, log basis x=10, xmin=1, xmax=4e7,
   xtick={10,100,1000,10000,100000,1000000},
   xticklabels={10,100,{1,000},{10,000},{100,000},{1,000,000}},
-  xmajorgrids, axis lines=left, clip=false,
+    xmajorgrids, axis lines=left, clip=false,
   xlabel={Count, logarithmic scale},
   symbolic y coords={bLR,bCB,pLR,pCB,cand,univ,dev},
   ytick={bLR,bCB,pLR,pCB,cand,univ,dev},
@@ -457,24 +457,24 @@ Let $y_i\in\{0,1\}$ be the event label of HO observation $i$, $p_i$ its predicte
 \paragraph{ROC-AUC}
 The area under the receiver operating characteristic curve is the probability that a randomly chosen event scores higher than a randomly chosen non-event, with half credit for ties \cite{hanley1982},
 \begin{equation}
-  \AUC=\frac{1}{N_+N_-}\sum_{i:\,y_i=1}\sum_{j:\,y_j=0}\big[\mathbf{1}(p_i>p_j)+\tfrac12\mathbf{1}(p_i=p_j)\big].
-  \label{eq:roc_auc}
+    \AUC=\frac{1}{N_+N_-}\sum_{i:\,y_i=1}\sum_{j:\,y_j=0}\big[\mathbf{1}(p_i>p_j)+\tfrac12\mathbf{1}(p_i=p_j)\big].
+    \label{eq:roc_auc}
 \end{equation}
 Higher is better. ROC-AUC is threshold-free and is the sole headline metric; the Gini coefficient $2\,\AUC-1$ adds no information.
 
 \paragraph{KS}
 The Kolmogorov--Smirnov statistic is the maximum vertical separation between the cumulative score distributions of events and non-events,
 \begin{equation}
-  \KS=\max_{t}\,\big[\TPR(t)-\FPR(t)\big],
-  \label{eq:ks}
+    \KS=\max_{t}\,\big[\TPR(t)-\FPR(t)\big],
+    \label{eq:ks}
 \end{equation}
 which equals the maximum Youden index over thresholds \cite{youden1950}; higher is better. KS is reported as the maximum HO separation. A KS-optimal operating threshold is also recorded in each freeze manifest for deployment, but no threshold-dependent metric is reported, so the threshold plays no part in the results.
 
 \paragraph{Brier score}
 The Brier score is the mean squared error of the predicted probabilities \cite{brier1950},
 \begin{equation}
-  \mathrm{Brier}=\frac{1}{N}\sum_{i=1}^{N}(y_i-p_i)^2 ,
-  \label{eq:brier}
+    \mathrm{Brier}=\frac{1}{N}\sum_{i=1}^{N}(y_i-p_i)^2 ,
+    \label{eq:brier}
 \end{equation}
 lower is better. It measures the overall squared error of the predicted probabilities, which combines calibration and resolution, rather than ranking; a constant prediction equal to the event rate $\pi$ attains $\pi(1-\pi)$, and log loss, $-N^{-1}\sum_i[y_i\ln p_i+(1-y_i)\ln(1-p_i)]$, is a supporting diagnostic. Because both backbones use balanced class weights and no recalibration (Section~\ref{subsec:models}), their outputs are not population event probabilities, so Brier values compare selectors within a dataset and do not indicate deployment-ready calibration.
 
@@ -482,26 +482,26 @@ lower is better. It measures the overall squared error of the predicted probabil
 Let $T$ be the set of observations in the highest-scored decile, a fraction $q=|T|/N\approx0.10$ of the population. Capture@10 is the share of all events found in that decile and Lift@10 the ratio of the decile event rate to the portfolio event rate,
 \begin{equation}
 \begin{aligned}
-  \mathrm{Capture@10}&=\frac{\sum_{i\in T}y_i}{\sum_{i}y_i},\\
-  \mathrm{Lift@10}&=\frac{|T|^{-1}\sum_{i\in T}y_i}{N^{-1}\sum_{i}y_i}=\frac{\mathrm{Capture@10}}{q};
+    \mathrm{Capture@10}&=\frac{\sum_{i\in T}y_i}{\sum_{i}y_i},\\
+    \mathrm{Lift@10}&=\frac{|T|^{-1}\sum_{i\in T}y_i}{N^{-1}\sum_{i}y_i}=\frac{\mathrm{Capture@10}}{q};
 \end{aligned}
-  \label{eq:capture10}
+    \label{eq:capture10}
 \end{equation}
 higher is better, and Lift equals ten times Capture only when the decile is exact.
 
 \paragraph{PSI}
 The population stability index compares a reference distribution with a later distribution over frozen states $b$,
 \begin{equation}
-  \PSI=\sum_{b}\big(o_b-r_b\big)\ln\frac{o_b}{r_b},
-  \label{eq:psi}
+    \PSI=\sum_{b}\big(o_b-r_b\big)\ln\frac{o_b}{r_b},
+    \label{eq:psi}
 \end{equation}
 where $r_b$ and $o_b$ are the reference (DEV) and HO proportions in state $b$ \cite{siddiqi2006,yurdakul2020}; lower indicates less shift. PSI is reported for the selected features only. A score PSI computed in earlier versions compared out-of-fold DEV scores of the five fold models with HO scores of the full-DEV refit, so it mixed scoring-model differences with population change, and it is not reported. For \emph{feature PSI} the states are type-aware: DEV quantile bins plus a missing state for continuous variables, explicit 0/1/missing/unexpected states for binary and one-hot variables, exact DEV levels for discrete variables, and DEV categories plus missing and unseen states for source categoricals. Bins and states are learned on DEV, frozen and applied unchanged to HO; mean, median and maximum feature PSI over the selected subset summarise drift within the chosen inputs. A feature PSI of zero means that no distribution difference was detected under the implemented states, binning and numerical precision, not that the underlying distributions are identical. The conventional references of 0.10 and 0.25 are descriptive monitoring thresholds, not critical values \cite{yurdakul2020}.
 
 \paragraph{Nogueira stability}
 Let $Z_{fj}\in\{0,1\}$ indicate whether feature $j$ of a candidate universe of size $d$ is selected in the $f$-th of $B$ selected subsets, $f=1,\dots,B$. Throughout the paper the subsets are the five development folds, $B=5$, except in the repeated-call measurement of Section~\ref{subsec:stability_results}, where they are ten responses to one fixed prompt, $B=10$. With $\hat p_j=B^{-1}\sum_f Z_{fj}$, $s_j^2=\frac{B}{B-1}\hat p_j(1-\hat p_j)$ and $\bar k=\sum_j \hat p_j$, the Nogueira estimator is \cite{nogueira2018}
 \begin{equation}
-  \hat\Phi=1-\frac{d^{-1}\sum_{j=1}^{d}s_j^2}{(\bar k/d)\,(1-\bar k/d)} .
-  \label{eq:nogueira}
+    \hat\Phi=1-\frac{d^{-1}\sum_{j=1}^{d}s_j^2}{(\bar k/d)\,(1-\bar k/d)} .
+    \label{eq:nogueira}
 \end{equation}
 It equals 1 when the same subset is selected in every fold, is chance-corrected so that random selection gives values near 0, and can be negative. The universe $d$ is the pool from which the fold-local selector chose: the screened candidate set (373, 675 or 1,068 features) for the classical selectors, the LLM hybrids and the pure LLM lists. $\hat\Phi$ is reported for selectors refitted in each fold and, over the same candidate set, for the pure LLM lists, which were requested separately per fold rather than refitted; because the candidate list supplied is the same in every call (Section~\ref{subsec:llm_fs}), a fold-to-fold difference between those lists reflects the sampling of the language model at a fixed prompt rather than any change in what it was asked to rank. Section~\ref{subsec:stability_results} reports a direct measurement of that sampling on Stability 2024.
 
@@ -634,16 +634,16 @@ LLM-assisted leader $-$ classical leader & $-0.021$ & $+0.012$ & $+0.030$ & $+0.
 \centering
 \begin{tikzpicture}
 \begin{groupplot}[
-  paper,
-  group style={group size=2 by 1, horizontal sep=8mm, y descriptions at=edge left},
-  scale only axis, width=3.9cm, height=4.6cm,
-  ymin=0.4, ymax=6.6, ytick={1,2,3,4,5,6},
-  yticklabels={{Stability 2024, CatBoost},{Stability 2024, LR},{LendingClub, CatBoost},{LendingClub, LR},{Home Credit, CatBoost},{Home Credit, LR}},
-  xmajorgrids, axis lines=left, clip=false,
-  xticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2},
+    paper,
+    group style={group size=2 by 1, horizontal sep=8mm, y descriptions at=edge left},
+    scale only axis, width=3.9cm, height=4.6cm,
+    ymin=0.4, ymax=6.6, ytick={1,2,3,4,5,6},
+    yticklabels={{Stability 2024, CatBoost},{Stability 2024, LR},{LendingClub, CatBoost},{LendingClub, LR},{Home Credit, CatBoost},{Home Credit, LR}},
+    xmajorgrids, axis lines=left, clip=false,
+    xticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2},
 ]
 \nextgroupplot[title={(a) Held-out ROC-AUC}, xlabel={ROC-AUC}, xmin=0.69, xmax=0.90, xtick={0.70,0.75,0.80,0.85,0.90},
-  legend to name=primlegend, legend columns=3]
+    legend to name=primlegend, legend columns=3]
 \addplot[cGrey, line width=1.4pt, forget plot] coordinates {(0.854644,1) (0.878400,1)};
 \addplot[cGrey, line width=1.4pt, forget plot] coordinates {(0.821394,2) (0.834400,2)};
 \addplot[cGrey, line width=1.4pt, forget plot] coordinates {(0.720147,3) (0.770664,3)};
@@ -651,32 +651,32 @@ LLM-assisted leader $-$ classical leader & $-0.021$ & $+0.012$ & $+0.030$ & $+0.
 \addplot[cGrey, line width=1.4pt, forget plot] coordinates {(0.781426,5) (0.793450,5)};
 \addplot[cGrey, line width=1.4pt, forget plot] coordinates {(0.769890,6) (0.748857,6)};
 \addplot[only marks, mark=square*, mark size=2.6pt, cOrange]
-  coordinates {(0.854644,1) (0.821394,2) (0.720147,3) (0.709803,4) (0.781426,5) (0.769890,6)};
+    coordinates {(0.854644,1) (0.821394,2) (0.720147,3) (0.709803,4) (0.781426,5) (0.769890,6)};
 \addlegendentry{Classical family leader}
 \addplot[only marks, mark=*, mark size=2.8pt, cBlue]
-  coordinates {(0.878400,1) (0.834400,2) (0.770664,3) (0.740234,4) (0.793450,5) (0.748857,6)};
+    coordinates {(0.878400,1) (0.834400,2) (0.770664,3) (0.740234,4) (0.793450,5) (0.748857,6)};
 \addlegendentry{LLM-assisted family leader}
 \addplot[only marks, mark=triangle, mark size=3.2pt, thick, cGrey!60!black]
-  coordinates {(0.82449,1) (0.77191,2) (0.722973,3) (0.710887,4) (0.786032,5) (0.771496,6)};
+    coordinates {(0.82449,1) (0.77191,2) (0.722973,3) (0.710887,4) (0.786032,5) (0.771496,6)};
 \addlegendentry{Full-feature reference}
 \nextgroupplot[title={(b) Paired $\Delta$AUC, 95\% CI}, xlabel={LLM-assisted $-$ classical}, xmin=-0.04, xmax=0.066, xtick={-0.04,-0.02,0,0.02,0.04,0.06}]
 \draw[gray!60!black, dashed] (axis cs:0,0.4) -- (axis cs:0,6.6);
 \addplot[only marks, mark=*, mark size=2.8pt, cBlue,
-  error bars/.cd, x dir=both, x explicit,
-  error bar style={line width=1pt, cBlue},
-  error mark options={rotate=90, mark size=2.2pt, cBlue}]
-  coordinates {
-    (0.023756,1) -= (0.002795,0) += (0.002855,0)
-    (0.013006,2) -= (0.002365,0) += (0.002265,0)
-    (0.050517,3) -= (0.000805,0) += (0.000798,0)
-    (0.030431,4) -= (0.001072,0) += (0.001083,0)
-    (0.012024,5) -= (0.002711,0) += (0.002817,0)
-  };
+    error bars/.cd, x dir=both, x explicit,
+    error bar style={line width=1pt, cBlue},
+    error mark options={rotate=90, mark size=2.2pt, cBlue}]
+    coordinates {
+        (0.023756,1) -= (0.002795,0) += (0.002855,0)
+        (0.013006,2) -= (0.002365,0) += (0.002265,0)
+        (0.050517,3) -= (0.000805,0) += (0.000798,0)
+        (0.030431,4) -= (0.001072,0) += (0.001083,0)
+        (0.012024,5) -= (0.002711,0) += (0.002817,0)
+    };
 \addplot[only marks, mark=square*, mark size=2.6pt, cRed,
-  error bars/.cd, x dir=both, x explicit,
-  error bar style={line width=1pt, cRed},
-  error mark options={rotate=90, mark size=2.2pt, cRed}]
-  coordinates { (-0.021033,6) -= (0.001178,0) += (0.001253,0) };
+    error bars/.cd, x dir=both, x explicit,
+    error bar style={line width=1pt, cRed},
+    error mark options={rotate=90, mark size=2.2pt, cRed}]
+    coordinates { (-0.021033,6) -= (0.001178,0) += (0.001253,0) };
 \node[font=\scriptsize, above=6pt] at (axis cs:0.023756,1) {$+0.024$};
 \node[font=\scriptsize, above=6pt] at (axis cs:0.013006,2) {$+0.013$};
 \node[font=\scriptsize, above=6pt] at (axis cs:0.050517,3) {$+0.051$};
@@ -890,31 +890,31 @@ Stability 2024 & CatBoost & 40 & 10 & 0.8740--0.8832 & 0.0092 \\
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-  paper,
-  scale only axis, width=11cm, height=7.5cm,
-  axis lines=left, clip=false,
-  xlabel={Nogueira stability $\hat\Phi$}, ylabel={Mean pairwise Jaccard similarity},
-  xmin=0.39, xmax=1.00, ymin=0.28, ymax=0.96,
-  xtick={0.40,0.50,0.60,0.70,0.80,0.90,1.00},
-  ytick={0.30,0.40,0.50,0.60,0.70,0.80,0.90},
-  xticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2, /pgf/number format/zerofill},
-  yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2, /pgf/number format/zerofill},
-  xmajorgrids, ymajorgrids,
-  legend pos=south east, legend cell align=left,
+    paper,
+    scale only axis, width=11cm, height=7.5cm,
+    axis lines=left, clip=false,
+    xlabel={Nogueira stability $\hat\Phi$}, ylabel={Mean pairwise Jaccard similarity},
+    xmin=0.39, xmax=1.00, ymin=0.28, ymax=0.96,
+    xtick={0.40,0.50,0.60,0.70,0.80,0.90,1.00},
+    ytick={0.30,0.40,0.50,0.60,0.70,0.80,0.90},
+    xticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2, /pgf/number format/zerofill},
+    yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2, /pgf/number format/zerofill},
+    xmajorgrids, ymajorgrids,
+    legend pos=south east, legend cell align=left,
 ]
 \addplot[domain=0.40:0.96, samples=2, dashed, gray!60, forget plot] {x};
 \node[font=\scriptsize, gray!60!black, rotate=31, anchor=south] at (axis cs:0.50,0.50) {Jaccard $=$ Nogueira};
 \addplot[only marks, mark=*, mark size=2.8pt, cOrange]
-  coordinates {(0.8838,0.8053) (0.9588,0.9273) (0.7860,0.6666)};
+    coordinates {(0.8838,0.8053) (0.9588,0.9273) (0.7860,0.6666)};
 \addlegendentry{Classical leader, LR}
 \addplot[only marks, mark=square*, mark size=2.6pt, cOrange]
-  coordinates {(0.8403,0.7538) (0.9070,0.8462) (0.7793,0.6582)};
+    coordinates {(0.8403,0.7538) (0.9070,0.8462) (0.7793,0.6582)};
 \addlegendentry{Classical leader, CatBoost}
 \addplot[only marks, mark=*, mark size=2.8pt, cGreen]
-  coordinates {(0.5403,0.4076) (0.5517,0.4011)};
+    coordinates {(0.5403,0.4076) (0.5517,0.4011)};
 \addlegendentry{Pure LLM, LR}
 \addplot[only marks, mark=square*, mark size=2.6pt, cGreen]
-  coordinates {(0.4092,0.3149) (0.6280,0.4828)};
+    coordinates {(0.4092,0.3149) (0.6280,0.4828)};
 \addlegendentry{Pure LLM, CatBoost}
 \node[font=\scriptsize, anchor=south east, xshift=-2pt, yshift=2pt] at (axis cs:0.5403,0.4076) {HC};
 \node[font=\scriptsize, anchor=north west, xshift=2pt, yshift=-2pt] at (axis cs:0.5517,0.4011) {LC};
@@ -1076,10 +1076,10 @@ The authors declare that they have no known competing financial interests or per
 \section*{Data availability}
 The three datasets are publicly available on Kaggle, and their redistribution is governed by the terms of the respective competitions and dataset licences:
 \begin{itemize}
-  \item Home Credit Default Risk: \url{https://www.kaggle.com/competitions/home-credit-default-risk/data}
-  \item All Lending Club loan data: \url{https://www.kaggle.com/datasets/wordsforthewise/lending-club}
-  \item Home Credit -- Credit Risk Model Stability: \url{https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability/data}
-  \item Code, configuration files, cached LLM rankings, result files and the headline subsets: \url{https://github.com/dilshodazamjonov/Feature-Selection-Research}
+    \item Home Credit Default Risk: \url{https://www.kaggle.com/competitions/home-credit-default-risk/data}
+    \item All Lending Club loan data: \url{https://www.kaggle.com/datasets/wordsforthewise/lending-club}
+    \item Home Credit -- Credit Risk Model Stability: \url{https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability/data}
+    \item Code, configuration files, cached LLM rankings, result files and the headline subsets: \url{https://github.com/dilshodazamjonov/Feature-Selection-Research}
 \end{itemize}
 
 \appendix
@@ -1189,8 +1189,8 @@ This appendix reports the pre-declared classical rank-voting family in full; it 
 
 Rank aggregation combines several rankings of the same candidate set of $d$ features. For a feature with rank $r$ in a source ranking (rank 1 best) the normalised rank is
 \begin{equation}
-  r^{\mathrm{norm}}=\frac{r-1}{d-1},
-  \label{eq:normrank}
+    r^{\mathrm{norm}}=\frac{r-1}{d-1},
+    \label{eq:normrank}
 \end{equation}
 so that the best feature maps to 0 and the worst to 1. Averaging normalised ranks is a Borda-type rule \cite{dwork2001} in the tradition of ensemble feature selection \cite{saeys2008}.
 
@@ -1250,23 +1250,23 @@ The same curves separate the two factors that differ between the backbones. At e
 \centering
 \begin{tikzpicture}
 \begin{groupplot}[
-  paper,
-  group style={group size=2 by 1, horizontal sep=18mm},
-  scale only axis, width=4.9cm, height=4.0cm, clip=false,
-  xmin=5, xmax=55, xtick={10,20,30,40,50},
-  xlabel={Feature budget $\Kfeat$},
-  ymajorgrids, axis lines=left,
-  yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=3, /pgf/number format/zerofill},
+    paper,
+    group style={group size=2 by 1, horizontal sep=18mm},
+    scale only axis, width=4.9cm, height=4.0cm, clip=false,
+    xmin=5, xmax=55, xtick={10,20,30,40,50},
+    xlabel={Feature budget $\Kfeat$},
+    ymajorgrids, axis lines=left,
+    yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=3, /pgf/number format/zerofill},
 ]
 \nextgroupplot[title={(a) Mean DEV AUC}, ylabel={Difference in mean DEV AUC}, ymin=-0.024, ymax=0.009, ytick={-0.02,-0.015,-0.01,-0.005,0,0.005},
-  legend style={at={(0.98,0.05)}, anchor=south east, draw=none, fill=none, font=\scriptsize}]
+    legend style={at={(0.98,0.05)}, anchor=south east, draw=none, fill=none, font=\scriptsize}]
 \draw[gray!60!black, dashed] (axis cs:5,0) -- (axis cs:55,0);
 \addplot[cBlue, semithick, mark=*, mark size=2.2pt] coordinates {(10,-0.014735) (20,0.000000) (30,0.004031) (40,0.004990) (50,0.004506)};
 \addlegendentry{LR, $\Kfeat=20$}
 \addplot[cOrange, semithick, mark=square*, mark size=2.0pt] coordinates {(10,-0.018775) (20,-0.008273) (30,-0.001311) (40,0.000000) (50,-0.000587)};
 \addlegendentry{CatBoost, $\Kfeat=40$}
 \nextgroupplot[title={(b) Family-leader gap}, ylabel={Difference in DEV AUC}, ymin=-0.028, ymax=0.052, ytick={-0.02,-0.01,0,0.01,0.02,0.03,0.04,0.05},
-  legend to name=budgetlegend, legend columns=3, legend style={draw=none, fill=none, font=\scriptsize}]
+    legend to name=budgetlegend, legend columns=3, legend style={draw=none, fill=none, font=\scriptsize}]
 \draw[gray!60!black, dashed] (axis cs:5,0) -- (axis cs:55,0);
 \addplot[cBlue, semithick, mark=*, mark size=2.2pt] coordinates {(10,-0.013960) (20,-0.018022) (30,-0.021352) (40,-0.018588) (50,-0.017754)};
 \addlegendentry{Home Credit, LR}
@@ -1498,332 +1498,332 @@ During the preparation of this work the authors used Claude (Anthropic) to gener
 \sloppy\hbadness=10000
 \begin{thebibliography}{10}
 \expandafter\ifx\csname url\endcsname\relax
- \def\url#1{\texttt{#1}}\fi
+  \def\url#1{\texttt{#1}}\fi
 \expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
 \expandafter\ifx\csname href\endcsname\relax
- \def\href#1#2{#2} \def\path#1{#1}\fi
+  \def\href#1#2{#2} \def\path#1{#1}\fi
 
 \bibitem{thomas2002}
 L.~C. Thomas, D.~B. Edelman, J.~N. Crook, Credit Scoring and Its Applications,
- SIAM, Philadelphia, 2002.
+  SIAM, Philadelphia, 2002.
 
 \bibitem{siddiqi2006}
 N.~Siddiqi, Credit Risk Scorecards: Developing and Implementing Intelligent
- Credit Scoring, John Wiley \& Sons, Hoboken, NJ, 2006.
+  Credit Scoring, John Wiley \& Sons, Hoboken, NJ, 2006.
 
 \bibitem{lessmann2015}
 S.~Lessmann, B.~Baesens, H.-V. Seow, L.~C. Thomas, Benchmarking
- state-of-the-art classification algorithms for credit scoring: An update of
- research, Eur. J. Oper. Res. 247~(1) (2015) 124--136.
+  state-of-the-art classification algorithms for credit scoring: An update of
+  research, Eur. J. Oper. Res. 247~(1) (2015) 124--136.
 \newblock \href {https://doi.org/10.1016/j.ejor.2015.05.030}
- {\path{doi:10.1016/j.ejor.2015.05.030}}.
+  {\path{doi:10.1016/j.ejor.2015.05.030}}.
 
 \bibitem{gunnarsson2021}
 B.~R. Gunnarsson, S.~vanden Broucke, B.~Baesens, M.~{\'O}skarsd{\'o}ttir,
- W.~Lemahieu, Deep learning for credit scoring: Do or don't?, Eur. J. Oper. Res. 295~(1) (2021) 292--305.
+  W.~Lemahieu, Deep learning for credit scoring: Do or don't?, Eur. J. Oper. Res. 295~(1) (2021) 292--305.
 \newblock \href {https://doi.org/10.1016/j.ejor.2021.03.006}
- {\path{doi:10.1016/j.ejor.2021.03.006}}.
+  {\path{doi:10.1016/j.ejor.2021.03.006}}.
 
 \bibitem{ballegeer2025}
 M.~Ballegeer, M.~Bogaert, D.~F. Benoit, Evaluating the stability of model
- explanations in instance-dependent cost-sensitive credit scoring, Eur. J. Oper. Res. 326~(3) (2025) 630--640.
+  explanations in instance-dependent cost-sensitive credit scoring, Eur. J. Oper. Res. 326~(3) (2025) 630--640.
 \newblock \href {https://doi.org/10.1016/j.ejor.2025.05.041}
- {\path{doi:10.1016/j.ejor.2025.05.041}}.
+  {\path{doi:10.1016/j.ejor.2025.05.041}}.
 
 \bibitem{guyon2003}
 I.~Guyon, A.~Elisseeff, An introduction to variable and feature selection,
- J. Mach. Learn. Res. 3 (2003) 1157--1182.
+  J. Mach. Learn. Res. 3 (2003) 1157--1182.
 
 \bibitem{peng2005}
 H.~Peng, F.~Long, C.~Ding, Feature selection based on mutual information:
- Criteria of max-dependency, max-relevance, and min-redundancy, IEEE Trans. Pattern Anal. Mach. Intell. 27~(8) (2005)
- 1226--1238.
+  Criteria of max-dependency, max-relevance, and min-redundancy, IEEE Trans. Pattern Anal. Mach. Intell. 27~(8) (2005)
+  1226--1238.
 \newblock \href {https://doi.org/10.1109/TPAMI.2005.159}
- {\path{doi:10.1109/TPAMI.2005.159}}.
+  {\path{doi:10.1109/TPAMI.2005.159}}.
 
 \bibitem{kohavi1997}
 R.~Kohavi, G.~H. John, Wrappers for feature subset selection, Artif. Intell. 97~(1--2) (1997) 273--324.
 \newblock \href {https://doi.org/10.1016/S0004-3702(97)00043-X}
- {\path{doi:10.1016/S0004-3702(97)00043-X}}.
+  {\path{doi:10.1016/S0004-3702(97)00043-X}}.
 
 \bibitem{guyon2002}
 I.~Guyon, J.~Weston, S.~Barnhill, V.~Vapnik, Gene selection for cancer
- classification using support vector machines, Mach. Learn. 46~(1--3)
- (2002) 389--422.
+  classification using support vector machines, Mach. Learn. 46~(1--3)
+  (2002) 389--422.
 \newblock \href {https://doi.org/10.1023/A:1012487302797}
- {\path{doi:10.1023/A:1012487302797}}.
+  {\path{doi:10.1023/A:1012487302797}}.
 
 \bibitem{kursa2010}
 M.~B. Kursa, W.~R. Rudnicki, Feature selection with the {B}oruta package,
- J. Stat. Softw. 36~(11) (2010) 1--13.
+  J. Stat. Softw. 36~(11) (2010) 1--13.
 \newblock \href {https://doi.org/10.18637/jss.v036.i11}
- {\path{doi:10.18637/jss.v036.i11}}.
+  {\path{doi:10.18637/jss.v036.i11}}.
 
 \bibitem{tibshirani1996}
 R.~Tibshirani, Regression shrinkage and selection via the lasso, J. R. Stat. Soc. Ser. B Methodol. 58~(1) (1996) 267--288.
 \newblock \href {https://doi.org/10.1111/j.2517-6161.1996.tb02080.x}
- {\path{doi:10.1111/j.2517-6161.1996.tb02080.x}}.
+  {\path{doi:10.1111/j.2517-6161.1996.tb02080.x}}.
 
 \bibitem{lundberg2017}
 S.~M. Lundberg, S.-I. Lee, A unified approach to interpreting model
- predictions, in: Advances in Neural Information Processing Systems 30, 2017,
- pp. 4765--4774.
+  predictions, in: Advances in Neural Information Processing Systems 30, 2017,
+  pp. 4765--4774.
 
 \bibitem{choi2022}
 K.~Choi, C.~Cundy, S.~Srivastava, S.~Ermon, {LMPriors}: Pre-trained language
- models as task-specific priors, arXiv preprint arXiv:2210.12530 (2022).
+  models as task-specific priors, arXiv preprint arXiv:2210.12530 (2022).
 \newblock \href {https://doi.org/10.48550/arXiv.2210.12530}
- {\path{doi:10.48550/arXiv.2210.12530}}.
+  {\path{doi:10.48550/arXiv.2210.12530}}.
 
 \bibitem{jeong2025}
 D.~P. Jeong, Z.~C. Lipton, P.~Ravikumar, {LLM-Select}: Feature selection with
- large language models, Trans. Mach. Learn. Res. (2025).
+  large language models, Trans. Mach. Learn. Res. (2025).
 
 \bibitem{li2025sigkdd}
 D.~Li, Z.~Tan, H.~Liu, Exploring large language models for feature selection: A
- data-centric perspective, ACM SIGKDD Explor. Newsl. 26~(2) (2025)
- 44--53.
+  data-centric perspective, ACM SIGKDD Explor. Newsl. 26~(2) (2025)
+  44--53.
 \newblock \href {https://doi.org/10.1145/3715073.3715077}
- {\path{doi:10.1145/3715073.3715077}}.
+  {\path{doi:10.1145/3715073.3715077}}.
 
 \bibitem{zhang2025llmlasso}
 E.~Zhang, R.~Goto, N.~Sagan, J.~Mutter, N.~Phillips, A.~Alizadeh, K.~Lee,
- J.~Blanchet, M.~Pilanci, R.~Tibshirani, {LLM-Lasso}: A robust framework for
- domain-informed feature selection and regularization, arXiv preprint
- arXiv:2502.10648 (2025).
+  J.~Blanchet, M.~Pilanci, R.~Tibshirani, {LLM-Lasso}: A robust framework for
+  domain-informed feature selection and regularization, arXiv preprint
+  arXiv:2502.10648 (2025).
 \newblock \href {https://doi.org/10.48550/arXiv.2502.10648}
- {\path{doi:10.48550/arXiv.2502.10648}}.
+  {\path{doi:10.48550/arXiv.2502.10648}}.
 
 \bibitem{kalousis2007}
 A.~Kalousis, J.~Prados, M.~Hilario, Stability of feature selection algorithms:
- a study on high-dimensional spaces, Knowl. Inf. Syst. 12~(1)
- (2007) 95--116.
+  a study on high-dimensional spaces, Knowl. Inf. Syst. 12~(1)
+  (2007) 95--116.
 \newblock \href {https://doi.org/10.1007/s10115-006-0040-8}
- {\path{doi:10.1007/s10115-006-0040-8}}.
+  {\path{doi:10.1007/s10115-006-0040-8}}.
 
 \bibitem{nogueira2018}
 S.~Nogueira, K.~Sechidis, G.~Brown, On the stability of feature selection
- algorithms, J. Mach. Learn. Res. 18~(174) (2018) 1--54.
+  algorithms, J. Mach. Learn. Res. 18~(174) (2018) 1--54.
 
 \bibitem{homecredit2018}
 [dataset] {Home Credit Group},
- \href{https://www.kaggle.com/competitions/home-credit-default-risk}{Home
- {C}redit {D}efault {R}isk}, Kaggle competition dataset (2018).
+  \href{https://www.kaggle.com/competitions/home-credit-default-risk}{Home
+  {C}redit {D}efault {R}isk}, Kaggle competition dataset (2018).
 \newline\urlprefix\url{https://www.kaggle.com/competitions/home-credit-default-risk} (accessed 24 September 2026)
 
 \bibitem{lendingclub_kaggle}
 [dataset] N.~George,
- \href{https://www.kaggle.com/datasets/wordsforthewise/lending-club}{All
- {L}ending {C}lub loan data}, Kaggle dataset, version 3 (loans issued
- 2007--2018 Q4) (2019).
+  \href{https://www.kaggle.com/datasets/wordsforthewise/lending-club}{All
+  {L}ending {C}lub loan data}, Kaggle dataset, version 3 (loans issued
+  2007--2018 Q4) (2019).
 \newline\urlprefix\url{https://www.kaggle.com/datasets/wordsforthewise/lending-club} (accessed 24 September 2026)
 
 \bibitem{homecredit2024}
 [dataset] {Home Credit Group},
- \href{https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability}{Home
- {C}redit -- {C}redit {R}isk {M}odel {S}tability}, Kaggle competition dataset
- (2024).
+  \href{https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability}{Home
+  {C}redit -- {C}redit {R}isk {M}odel {S}tability}, Kaggle competition dataset
+  (2024).
 \newline\urlprefix\url{https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability} (accessed 24 September 2026)
 
 \bibitem{prokhorenkova2018}
 L.~Prokhorenkova, G.~Gusev, A.~Vorobev, A.~V. Dorogush, A.~Gulin, {CatBoost}:
- unbiased boosting with categorical features, in: Advances in Neural
- Information Processing Systems 31, 2018, pp. 6638--6648.
+  unbiased boosting with categorical features, in: Advances in Neural
+  Information Processing Systems 31, 2018, pp. 6638--6648.
 
 \bibitem{openai2025gpt41}
 {OpenAI}, \href{https://openai.com/index/gpt-4-1/}{Introducing {GPT-4.1} in the
- {API}}, OpenAI product announcement, 14 April 2025 (2025).
+  {API}}, OpenAI product announcement, 14 April 2025 (2025).
 \newline\urlprefix\url{https://openai.com/index/gpt-4-1/} (accessed 24 September 2026)
 
 \bibitem{baesens2003}
 B.~Baesens, T.~Van~Gestel, S.~Viaene, M.~Stepanova, J.~Suykens, J.~Vanthienen,
- Benchmarking state-of-the-art classification algorithms for credit scoring,
- J. Oper. Res. Soc. 54~(6) (2003) 627--635.
+  Benchmarking state-of-the-art classification algorithms for credit scoring,
+  J. Oper. Res. Soc. 54~(6) (2003) 627--635.
 \newblock \href {https://doi.org/10.1057/palgrave.jors.2601545}
- {\path{doi:10.1057/palgrave.jors.2601545}}.
+  {\path{doi:10.1057/palgrave.jors.2601545}}.
 
 \bibitem{maldonado2017}
 S.~Maldonado, C.~Bravo, J.~L{\'o}pez, J.~P{\'e}rez, Integrated framework for
- profit-based feature selection and {SVM} classification in credit scoring,
- Decis. Support Syst. 104 (2017) 113--121.
+  profit-based feature selection and {SVM} classification in credit scoring,
+  Decis. Support Syst. 104 (2017) 113--121.
 \newblock \href {https://doi.org/10.1016/j.dss.2017.10.007}
- {\path{doi:10.1016/j.dss.2017.10.007}}.
+  {\path{doi:10.1016/j.dss.2017.10.007}}.
 
 \bibitem{breiman2001}
 L.~Breiman, Random forests, Mach. Learn. 45~(1) (2001) 5--32.
 \newblock \href {https://doi.org/10.1023/A:1010933404324}
- {\path{doi:10.1023/A:1010933404324}}.
+  {\path{doi:10.1023/A:1010933404324}}.
 
 \bibitem{boloncanedo2015}
 V.~Bol{\'o}n-Canedo, N.~S{\'a}nchez-Maro{\~n}o, A.~Alonso-Betanzos, Recent
- advances and emerging challenges of feature selection in the context of big
- data, Knowl.-Based Syst. 86 (2015) 33--45.
+  advances and emerging challenges of feature selection in the context of big
+  data, Knowl.-Based Syst. 86 (2015) 33--45.
 \newblock \href {https://doi.org/10.1016/j.knosys.2015.05.014}
- {\path{doi:10.1016/j.knosys.2015.05.014}}.
+  {\path{doi:10.1016/j.knosys.2015.05.014}}.
 
 \bibitem{kuncheva2007}
 L.~I. Kuncheva, A stability index for feature selection, in: Proceedings of the
- 25th IASTED International Multi-Conference: Artificial Intelligence and
- Applications, Innsbruck, Austria, 2007, pp. 390--395.
+  25th IASTED International Multi-Conference: Artificial Intelligence and
+  Applications, Innsbruck, Austria, 2007, pp. 390--395.
 
 \bibitem{saeys2008}
 Y.~Saeys, T.~Abeel, Y.~Van~de Peer, Robust feature selection using ensemble
- feature selection techniques, in: Machine Learning and Knowledge Discovery in
- Databases (ECML PKDD 2008), Lecture Notes in Computer Science 5212, 2008, pp.
- 313--325.
+  feature selection techniques, in: Machine Learning and Knowledge Discovery in
+  Databases (ECML PKDD 2008), Lecture Notes in Computer Science 5212, 2008, pp.
+  313--325.
 \newblock \href {https://doi.org/10.1007/978-3-540-87481-2_21}
- {\path{doi:10.1007/978-3-540-87481-2_21}}.
+  {\path{doi:10.1007/978-3-540-87481-2_21}}.
 
 \bibitem{dwork2001}
 C.~Dwork, R.~Kumar, M.~Naor, D.~Sivakumar, Rank aggregation methods for the
- {W}eb, in: Proceedings of the 10th International Conference on World Wide Web
- (WWW 2001), 2001, pp. 613--622.
+  {W}eb, in: Proceedings of the 10th International Conference on World Wide Web
+  (WWW 2001), 2001, pp. 613--622.
 \newblock \href {https://doi.org/10.1145/371920.372165}
- {\path{doi:10.1145/371920.372165}}.
+  {\path{doi:10.1145/371920.372165}}.
 
 \bibitem{cawley2010}
 G.~C. Cawley, N.~L.~C. Talbot, On over-fitting in model selection and subsequent
- selection bias in performance evaluation, J. Mach. Learn. Res.
- 11 (2010) 2079--2107.
+  selection bias in performance evaluation, J. Mach. Learn. Res.
+  11 (2010) 2079--2107.
 
 \bibitem{jelizarow2010}
 M.~Jelizarow, V.~Guillemot, A.~Tenenhaus, K.~Strimmer, A.-L. Boulesteix,
- Over-optimism in bioinformatics: an illustration, Bioinformatics 26~(16)
- (2010) 1990--1998.
+  Over-optimism in bioinformatics: an illustration, Bioinformatics 26~(16)
+  (2010) 1990--1998.
 \newblock \href {https://doi.org/10.1093/bioinformatics/btq323}
- {\path{doi:10.1093/bioinformatics/btq323}}.
+  {\path{doi:10.1093/bioinformatics/btq323}}.
 
 \bibitem{berk2013}
 R.~Berk, L.~Brown, A.~Buja, K.~Zhang, L.~Zhao, Valid post-selection inference,
- Ann. Stat. 41~(2) (2013) 802--837.
+  Ann. Stat. 41~(2) (2013) 802--837.
 \newblock \href {https://doi.org/10.1214/12-AOS1077}
- {\path{doi:10.1214/12-AOS1077}}.
+  {\path{doi:10.1214/12-AOS1077}}.
 
 \bibitem{taylor2015}
 J.~Taylor, R.~J. Tibshirani, Statistical learning and selective inference,
- Proc. Natl. Acad. Sci. U.S.A. 112~(25) (2015) 7629--7634.
+  Proc. Natl. Acad. Sci. U.S.A. 112~(25) (2015) 7629--7634.
 \newblock \href {https://doi.org/10.1073/pnas.1507583112}
- {\path{doi:10.1073/pnas.1507583112}}.
+  {\path{doi:10.1073/pnas.1507583112}}.
 
 \bibitem{sanzguerrero2025}
 M.~Sanz-Guerrero, J.~Arroyo, Credit risk meets large language models: Building
- a risk indicator from loan descriptions in {P2P} lending, Intel. Artif. 28~(75) (2025) 220--247.
+  a risk indicator from loan descriptions in {P2P} lending, Intel. Artif. 28~(75) (2025) 220--247.
 \newblock \href {https://doi.org/10.4114/intartif.vol28iss75pp220-247}
- {\path{doi:10.4114/intartif.vol28iss75pp220-247}}.
+  {\path{doi:10.4114/intartif.vol28iss75pp220-247}}.
 
 \bibitem{xia2025}
 Y.~Xia, Z.~Han, Y.~Li, L.~He, Credit scoring model for fintech lending: An
- integration of large language models and {FocalPoly} loss, Int. J. Forecast. 41~(3) (2025) 894--919.
+  integration of large language models and {FocalPoly} loss, Int. J. Forecast. 41~(3) (2025) 894--919.
 \newblock \href {https://doi.org/10.1016/j.ijforecast.2024.07.005}
- {\path{doi:10.1016/j.ijforecast.2024.07.005}}.
+  {\path{doi:10.1016/j.ijforecast.2024.07.005}}.
 
 \bibitem{hollmann2023caafe}
 N.~Hollmann, S.~M{\"u}ller, F.~Hutter, Large language models for automated data
- science: Introducing {CAAFE} for context-aware automated feature engineering,
- in: Advances in Neural Information Processing Systems 36, 2023, pp.
- 44753--44775.
+  science: Introducing {CAAFE} for context-aware automated feature engineering,
+  in: Advances in Neural Information Processing Systems 36, 2023, pp.
+  44753--44775.
 
 \bibitem{han2024llmfe}
 S.~Han, J.~Yoon, S.~{\"O}. Arik, T.~Pfister, Large language models can
- automatically engineer features for few-shot tabular learning, in: Proceedings
- of the 41st International Conference on Machine Learning, PMLR 235, 2024, pp.
- 17454--17479.
+  automatically engineer features for few-shot tabular learning, in: Proceedings
+  of the 41st International Conference on Machine Learning, PMLR 235, 2024, pp.
+  17454--17479.
 
 \bibitem{nam2024octree}
 J.~Nam, K.~Kim, S.~Oh, J.~Tack, J.~Kim, J.~Shin, Optimized feature generation
- for tabular data via {LLMs} with decision tree reasoning, in: Advances in
- Neural Information Processing Systems 37, 2024, pp. 92352--92380.
+  for tabular data via {LLMs} with decision tree reasoning, in: Advances in
+  Neural Information Processing Systems 37, 2024, pp. 92352--92380.
 
 \bibitem{hegselmann2023tabllm}
 S.~Hegselmann, A.~Buendia, H.~Lang, M.~Agrawal, X.~Jiang, D.~Sontag, {TabLLM}:
- Few-shot classification of tabular data with large language models, in:
- Proceedings of the 26th International Conference on Artificial Intelligence
- and Statistics (AISTATS), PMLR 206, 2023, pp. 5549--5581.
+  Few-shot classification of tabular data with large language models, in:
+  Proceedings of the 26th International Conference on Artificial Intelligence
+  and Statistics (AISTATS), PMLR 206, 2023, pp. 5549--5581.
 
 \bibitem{bergmeir2012}
 C.~Bergmeir, J.~M. Ben{\'\i}tez, On the use of cross-validation for time series
- predictor evaluation, Inf. Sci. 191 (2012) 192--213.
+  predictor evaluation, Inf. Sci. 191 (2012) 192--213.
 \newblock \href {https://doi.org/10.1016/j.ins.2011.12.028}
- {\path{doi:10.1016/j.ins.2011.12.028}}.
+  {\path{doi:10.1016/j.ins.2011.12.028}}.
 
 \bibitem{gama2014}
 J.~Gama, I.~{\v{Z}}liobait{\.e}, A.~Bifet, M.~Pechenizkiy, A.~Bouchachia, A
- survey on concept drift adaptation, ACM Comput. Surv. 46~(4) (2014) 44.
+  survey on concept drift adaptation, ACM Comput. Surv. 46~(4) (2014) 44.
 \newblock \href {https://doi.org/10.1145/2523813} {\path{doi:10.1145/2523813}}.
 
 \bibitem{yurdakul2020}
 B.~Yurdakul, J.~Naranjo, Statistical properties of the population stability
- index, J. Risk Model Valid. 14 (2020) 89--100.
+  index, J. Risk Model Valid. 14 (2020) 89--100.
 \newblock \href {https://doi.org/10.21314/JRMV.2020.227}
- {\path{doi:10.21314/JRMV.2020.227}}.
+  {\path{doi:10.21314/JRMV.2020.227}}.
 
 \bibitem{kraskov2004}
 A.~Kraskov, H.~St{\"o}gbauer, P.~Grassberger, Estimating mutual information,
- Phys. Rev. E 69~(6) (2004) 066138.
+  Phys. Rev. E 69~(6) (2004) 066138.
 \newblock \href {https://doi.org/10.1103/PhysRevE.69.066138}
- {\path{doi:10.1103/PhysRevE.69.066138}}.
+  {\path{doi:10.1103/PhysRevE.69.066138}}.
 
 \bibitem{ross2014}
 B.~C. Ross, Mutual information between discrete and continuous data sets, PLoS
- ONE 9~(2) (2014) e87357.
+  ONE 9~(2) (2014) e87357.
 \newblock \href {https://doi.org/10.1371/journal.pone.0087357}
- {\path{doi:10.1371/journal.pone.0087357}}.
+  {\path{doi:10.1371/journal.pone.0087357}}.
 
 \bibitem{jolliffe2016}
 I.~T. Jolliffe, J.~Cadima, Principal component analysis: a review and recent
- developments, Philos. Trans. R. Soc. A 374~(2065)
- (2016) 20150202.
+  developments, Philos. Trans. R. Soc. A 374~(2065)
+  (2016) 20150202.
 \newblock \href {https://doi.org/10.1098/rsta.2015.0202}
- {\path{doi:10.1098/rsta.2015.0202}}.
+  {\path{doi:10.1098/rsta.2015.0202}}.
 
 \bibitem{jaccard1901}
 P.~Jaccard, {\'E}tude comparative de la distribution florale dans une portion
- des {A}lpes et des {J}ura, Bull. Soc. Vaud. Sci. Nat. 37 (1901) 547--579.
+  des {A}lpes et des {J}ura, Bull. Soc. Vaud. Sci. Nat. 37 (1901) 547--579.
 \newblock \href {https://doi.org/10.5169/seals-266450}
- {\path{doi:10.5169/seals-266450}}.
+  {\path{doi:10.5169/seals-266450}}.
 
 \bibitem{pedregosa2011}
 F.~Pedregosa, G.~Varoquaux, A.~Gramfort, V.~Michel, B.~Thirion, O.~Grisel,
- M.~Blondel, P.~Prettenhofer, R.~Weiss, V.~Dubourg, J.~Vanderplas, A.~Passos,
- D.~Cournapeau, M.~Brucher, M.~Perrot, {\'E}.~Duchesnay, Scikit-learn: Machine
- learning in {P}ython, J. Mach. Learn. Res. 12 (2011)
- 2825--2830.
+  M.~Blondel, P.~Prettenhofer, R.~Weiss, V.~Dubourg, J.~Vanderplas, A.~Passos,
+  D.~Cournapeau, M.~Brucher, M.~Perrot, {\'E}.~Duchesnay, Scikit-learn: Machine
+  learning in {P}ython, J. Mach. Learn. Res. 12 (2011)
+  2825--2830.
 
 \bibitem{hanley1982}
 J.~A. Hanley, B.~J. McNeil, The meaning and use of the area under a receiver
- operating characteristic ({ROC}) curve, Radiology 143~(1) (1982) 29--36.
+  operating characteristic ({ROC}) curve, Radiology 143~(1) (1982) 29--36.
 \newblock \href {https://doi.org/10.1148/radiology.143.1.7063747}
- {\path{doi:10.1148/radiology.143.1.7063747}}.
+  {\path{doi:10.1148/radiology.143.1.7063747}}.
 
 \bibitem{youden1950}
 W.~J. Youden, Index for rating diagnostic tests, Cancer 3~(1) (1950) 32--35.
 \newblock \href
- {https://doi.org/10.1002/1097-0142(1950)3:1<32::AID-CNCR2820030106>3.0.CO;2-3}
- {\path{doi:10.1002/1097-0142(1950)3:1<32::AID-CNCR2820030106>3.0.CO;2-3}}.
+  {https://doi.org/10.1002/1097-0142(1950)3:1<32::AID-CNCR2820030106>3.0.CO;2-3}
+  {\path{doi:10.1002/1097-0142(1950)3:1<32::AID-CNCR2820030106>3.0.CO;2-3}}.
 
 \bibitem{brier1950}
 G.~W. Brier, Verification of forecasts expressed in terms of probability,
- Mon. Weather Rev. 78~(1) (1950) 1--3.
+  Mon. Weather Rev. 78~(1) (1950) 1--3.
 \newblock \href
- {https://doi.org/10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2}
- {\path{doi:10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2}}.
+  {https://doi.org/10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2}
+  {\path{doi:10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2}}.
 
 \bibitem{delong1988}
 E.~R. DeLong, D.~M. DeLong, D.~L. Clarke-Pearson, Comparing the areas under two
- or more correlated receiver operating characteristic curves: A nonparametric
- approach, Biometrics 44~(3) (1988) 837--845.
+  or more correlated receiver operating characteristic curves: A nonparametric
+  approach, Biometrics 44~(3) (1988) 837--845.
 \newblock \href {https://doi.org/10.2307/2531595} {\path{doi:10.2307/2531595}}.
 
 \bibitem{efron1993}
 B.~Efron, R.~J. Tibshirani, An Introduction to the Bootstrap, Chapman \& Hall,
- New York, 1993.
+  New York, 1993.
 
 \bibitem{holm1979}
 S.~Holm, A simple sequentially rejective multiple test procedure, Scand. J. Stat. 6~(2) (1979) 65--70.
 
 \bibitem{demsar2006}
 J.~Dem{\v{s}}ar, Statistical comparisons of classifiers over multiple data
- sets, J. Mach. Learn. Res. 7 (2006) 1--30.
+  sets, J. Mach. Learn. Res. 7 (2006) 1--30.
 
 \end{thebibliography}
 \endgroup
