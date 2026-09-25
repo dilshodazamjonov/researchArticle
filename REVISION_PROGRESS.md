@@ -6,7 +6,7 @@ Progress file for the text-only revision run (prompt: `prompt.md`), completed 20
 
 - **Manuscript revised:** `submission/manuscript.tex` (the newest copy, with the layout fixes committed as the baseline and the `headline_subsets.csv` sentence that task W7 refers to). The root `manuscript.tex` is an older duplicate, left untouched.
 - **Git:** branch `revision/presentation-and-fit` from `main`; first commit = pre-existing uncommitted changes, unmodified; then one commit per task ID (list in `REVISION_CHANGELOG.md`, section 8). Nothing pushed.
-- **Deliverables:** `submission/manuscript.tex` + `.pdf`, `submission/supplementary.tex` + `.pdf`, `submission/highlights.txt`, `submission/revision_baseline.pdf` + `.log`, `submission/manuscript_diff.tex` + `.pdf` (latexdiff); `REVISION_CHANGELOG.md`, `number_inventory_report.md`, `qa_report.md`, `REVISION_PROGRESS.md` in the repository root.
+- **Deliverables:** `submission/manuscript.tex` + `.pdf`, `submission/supplementary.tex` + `.pdf`, `submission/highlights.txt`, `revision/revision_baseline.pdf` + `.log`, `revision/manuscript_diff.tex` + `.pdf` (latexdiff); `REVISION_CHANGELOG.md`, `number_inventory_report.md`, `qa_report.md`, `REVISION_PROGRESS.md` in the repository root.
 
 ## Task status
 
@@ -40,7 +40,7 @@ Progress file for the text-only revision run (prompt: `prompt.md`), completed 20
 
 ## 2.2 Baseline build
 
-- `submission/revision_baseline.pdf` (35 pages), `submission/revision_baseline.log`; warnings: 15 pdfTeX "destination with the same identifier" messages from the appendix table-counter resets; no undefined references; no overfull or underfull boxes.
+- `revision/revision_baseline.pdf` (35 pages), `revision/revision_baseline.log`; warnings: 15 pdfTeX "destination with the same identifier" messages from the appendix table-counter resets; no undefined references; no overfull or underfull boxes.
 
 ## 2.2 Word counts (texcount "Words in text")
 

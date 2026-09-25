@@ -6,10 +6,10 @@ Verification of the text-only revision (prompt sections 5 and 6). Tools: pdflate
 
 | Document | Passes | Pages | Errors | Undefined references or citations | Multiply defined labels | Overfull boxes |
 |---|---|---|---|---|---|---|
-| Reviewed manuscript (baseline, `submission/revision_baseline.pdf`) | 3 | 35 | 0 | 0 | 0 | 0 |
+| Reviewed manuscript (baseline, `revision/revision_baseline.pdf`) | 3 | 35 | 0 | 0 | 0 | 0 |
 | Revised manuscript (`submission/manuscript.pdf`) | 3 | 36 | 0 | 0 | 0 | 0 |
 | `submission/supplementary.pdf` | 2 | 4 | 0 | 0 | 0 | 0 |
-| latexdiff (`submission/manuscript_diff.pdf`, `-t CFONT`) | 3 | 40 | 0 | 0 | 0 | – |
+| latexdiff (`revision/manuscript_diff.pdf`, `-t CFONT`) | 3 | 40 | 0 | 0 | 0 | – |
 
 Warnings: the only warnings in both the baseline and the revised logs are pdfTeX "destination with the same identifier (name{table.N})" messages caused by the `\setcounter{table}{0}` resets at the start of each appendix (15 in the baseline, 14 in the revised build); they are pre-existing and harmless. No new overfull box (the baseline had none; the revised build has none).
 
@@ -53,7 +53,7 @@ Every `\ref` to `tab:lc_maturity`, `tab:diversity`, `tab:dimension`, `tab:stages
 
 ## 5.8 Neutral-or-favourable audit
 
-The diff (`submission/manuscript_diff.pdf`, 40 pages) was read change by change: no number changed; no claim was strengthened beyond the manuscript's numbers (the new framing sentences state what follows from the method definitions and are labelled as such); no claim was weakened; every disclosure of rule 1.6 remains (protocol evolution: `subsec:protocol_development`, `app:protocol`, Limitations; held-out populations inspected earlier: same places and the `fig:pipeline` caption; Stability 2024 cutoff moved: `subsec:dev_oot`, `subsec:protocol_development`, Limitations; development rule specified after the HO-rule results: `subsec:inference`, `tab:confirmatory` caption, Limitations; untuned full-feature reference: `subsec:models`, `tab:primary_results` caption, Limitations; protected attributes: `subsec:llm_fs`, `subsec:primary_results`, Limitations; memorisation of public material: Limitations; LendingClub resolved loans only: `subsec:dev_oot`, `app:robustness`; Home Credit recency holdout: Introduction, `subsec:datasets`, `tab:datasets` caption, `subsec:dev_oot`); no new caveat was added. Borderline rewordings are listed with their original wording in `REVISION_CHANGELOG.md`, section 5.
+The diff (`revision/manuscript_diff.pdf`, 40 pages) was read change by change: no number changed; no claim was strengthened beyond the manuscript's numbers (the new framing sentences state what follows from the method definitions and are labelled as such); no claim was weakened; every disclosure of rule 1.6 remains (protocol evolution: `subsec:protocol_development`, `app:protocol`, Limitations; held-out populations inspected earlier: same places and the `fig:pipeline` caption; Stability 2024 cutoff moved: `subsec:dev_oot`, `subsec:protocol_development`, Limitations; development rule specified after the HO-rule results: `subsec:inference`, `tab:confirmatory` caption, Limitations; untuned full-feature reference: `subsec:models`, `tab:primary_results` caption, Limitations; protected attributes: `subsec:llm_fs`, `subsec:primary_results`, Limitations; memorisation of public material: Limitations; LendingClub resolved loans only: `subsec:dev_oot`, `app:robustness`; Home Credit recency holdout: Introduction, `subsec:datasets`, `tab:datasets` caption, `subsec:dev_oot`); no new caveat was added. Borderline rewordings are listed with their original wording in `REVISION_CHANGELOG.md`, section 5.
 
 ## 5.9 Read-through
 

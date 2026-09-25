@@ -11,7 +11,7 @@ Line numbers refer to the reviewed version ("before") and the revised version ("
 | Task | Change | Before | After | Reason |
 |---|---|---|---|---|
 | Baseline | Pre-existing uncommitted layout changes committed unmodified | – | commit `3d78c42` | so that each later commit is one task ID |
-| 2.1–2.3 | Baseline build (`submission/revision_baseline.pdf`, `.log`), texcount, number inventory, CSV inventory | – | `REVISION_PROGRESS.md` | orientation |
+| 2.1–2.3 | Baseline build (`revision/revision_baseline.pdf`, `.log`), texcount, number inventory, CSV inventory | – | `REVISION_PROGRESS.md` | orientation |
 | F1 | Title replaced in `\title{}` and `pdftitle` | L55, L114 | same lines | prompt F1 |
 | F2 | New paragraph "Scale sharpens the case for such a pre-screen…" inserted after the Introduction's second paragraph (numbers verbatim; "Stability 2024" and "mRMR" used as the manuscript uses them) | after L148 | L150 | scale made central |
 | F2 | First contribution names the scale: "…whose semantic stage reads no data rows, across three credit portfolios of up to 1,959 engineered features and 1.5 million decisions (1,526,659)…" (both the rounded and the exact figure kept) | L155 | L157 | prompt F2 |
@@ -92,7 +92,7 @@ Every value in `tab:robustness`, `tab:cost_structure`, `tab:response_lists`, the
 - `priority_2/conservative_pair_interval.csv` holds a bootstrap interval for the third-rule Home Credit LR pair ($-0.0267$, $[-0.0285, -0.0250]$) whereas the manuscript says that interval was not computed; not changed (no new numbers were allowed).
 - `todo_done/45_repeated_calls.csv` and `todo_done/47_obfuscation.csv` hold repeated calls on Home Credit and LendingClub and an obfuscation run on LendingClub that the manuscript does not report; not used (rule 1.8).
 - In `todo_done/44_mechanical.csv` the "mechanical" and "cached" columns of the stable-core row appear swapped relative to the header; the manuscript's values are self-consistent.
-- The root `manuscript.tex` is a stale copy of the reviewed version; `submission/manuscript_source.zip` must be rebuilt from the revised files.
+- The root `manuscript.tex` is a stale copy of the reviewed version. `submission/manuscript_source.zip` was rebuilt from the revised files on 2026-09-25 (manuscript.tex, manuscript.pdf, supplementary.tex, supplementary.pdf, highlights.txt); the latexdiff and the baseline build were moved to `revision/`, and the submission folder holds only the submission files and the zip.
 
 ## 7. Checklist before submission
 
@@ -102,8 +102,8 @@ Every value in `tab:robustness`, `tab:cost_structure`, `tab:response_lists`, the
 - [ ] Approve the keyword change and the five highlights (`submission/highlights.txt`).
 - [ ] Check `submission/supplementary.tex` / `.pdf` (Tables S1–S6) and upload it as supplementary material.
 - [ ] Review the borderline changes of section 5 and revert any you disagree with.
-- [ ] Rebuild `submission/manuscript_source.zip`; decide what to do with the stale root `manuscript.tex`.
-- [ ] Merge or keep the branch `revision/presentation-and-fit`; `submission/manuscript_diff.pdf` is the latexdiff against the reviewed version.
+- [x] `submission/manuscript_source.zip` rebuilt (2026-09-25). Still open: decide what to do with the stale root `manuscript.tex`.
+- [ ] Merge or keep the branch `revision/presentation-and-fit`; `revision/manuscript_diff.pdf` is the latexdiff against the reviewed version.
 
 ## 8. Commits on the branch (newest first)
 
