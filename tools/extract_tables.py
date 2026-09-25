@@ -81,8 +81,8 @@ def tabular_bodies(table_src):
     return out
 
 
-def extract(path):
-    src = strip_comments(open(path, encoding='utf-8').read())
+def extract(path, text=None):
+    src = strip_comments(text if text is not None else open(path, encoding='utf-8').read())
     rows = []
     for n, (name, start, inner, inner_end, end) in enumerate(env_spans(src, ['table', 'table*']), 1):
         block = src[start:end]

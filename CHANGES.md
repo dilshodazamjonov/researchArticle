@@ -15,8 +15,9 @@ Revision of the Big Data Research manuscript, prompts 1 to 3. Branch `revision-p
 - `baseline/metrics.json`: `tools/measure.py` run on the baseline main file (with the supplement), plus the compile record of the baseline.
 - `baseline/tables.json`: `tools/extract_tables.py` run on both baseline files.
 - `metrics_after_p1.json`: `tools/measure.py` run on the files after Prompt 1, plus the compile record.
+- `metrics_after_p2.json`: the same, after Prompt 2.
 
-**Tools.** All three use the Python 3 standard library only.
+**Tools.** All four use the Python 3 standard library only.
 
 ### `tools/measure.py`
 
@@ -89,6 +90,7 @@ Usage: `python3 tools/extract_tables.py FILE.tex [FILE2.tex ...] [-o OUT.json]`.
 - For every `tabular`, `tabular*`, `tabularx` or `longtable` inside, it takes the body: the text between the column specification (after the width argument, if any) and the matching `\end`. Every whitespace run is collapsed to one space.
 - Several tabulars in one table are joined with ` ||| `.
 - Output: `{"sources": [...], "tables": {label: body}, "colspecs": {label: spec}, "envs": {label: env}, "files": {label: file}, "other_labels": {label: [...]}}`.
+- Since Prompt 2, `extract(path, text=None)` also accepts the file content directly; this is used to read a file at a given commit. The output is unchanged, and baseline output was re-verified as identical.
 
 ### `tools/check_p1.py`
 
@@ -110,6 +112,23 @@ Usage: `python3 tools/check_p1.py --baseline-commit 336b3f0 [--compile-dir DIR |
   - checks that every paragraph from Section 2 onward that cites the timing measurement says "unscreened 1,959-feature universe";
   - checks the A5 evidence.
 - S7: runs `git diff --cached --name-status` against the baseline commit, so the files of the commit must be staged first.
+
+### `tools/check_p2.py`
+
+Usage: `python3 tools/check_p2.py --p1-commit 901c263 [--compile-dir DIR | --log LOG] [-o REPORT.json]`. It runs checks S1–S5 and P1–P8 of Prompt 2 on `submission/manuscript.tex`.
+- "Sections 2–8" means the numbered sections from `\section{Related Work}` to the Conclusion, excluding the unnumbered back matter (CRediT to Data availability). Its running-text word count is the sum of `measure.py`'s `per_section` totals for Related Work to Conclusion; the baseline is 15,824 words.
+- S1: optionally compiles twice into DIR, then reads the log.
+- S2 and S5: as in `check_p1.py`, against `baseline/`.
+- S3: compares every table body, matched by label, with the file at the Prompt 1 commit (read through `git show`) plus the supplement.
+- S4: finds `all_body` tokens absent from baseline main ∪ supplement and checks that each is under "Derived numbers".
+- P1: reduction of the Sections 2–8 running-text words against the baseline; passes at 25% or more.
+- P2: takes the numeric tokens of the baseline Sections 2–8 span (text, captions, notes and cells). Each must occur somewhere in the new main file, or appear in back-quotes under "### Removed duplicates" in this file.
+- P3: phrase counts over Sections 2–8 in three scopes: running text; plus captions and table notes; plus table cells. The pass test uses the second scope, which covers all editable text; the third scope is reported.
+- P4: table/table* count before `\appendix`, the position of the two moved labels, and the absence of undefined references.
+- P5: checks that `\label{subsec:dev_to_ho}` exists; that every paragraph of the Headline comparison subsection is 120 words or fewer; that nine protected-attribute facts occur in the Discussion; and that none is left in the Results.
+- P6: sentences of Sections 2–8 over 45 and over 60 words.
+- P7: Conclusion words, and the location of "522" in the running text of Sections 2–8.
+- P8: byte comparison of the Introduction, abstract, keywords and highlights block with the Prompt 1 commit.
 
 ## Prompt 1
 
@@ -246,6 +265,152 @@ Run with `python3 tools/check_p1.py --baseline-commit 336b3f0 --compile-dir <scr
 
 ## Prompt 2
 
+### Step 0: precheck
+
+- On branch `revision-presentation` at `901c263`. The Prompt 1 self-check is all PASS, Unresolved was empty, and `tools/` was present.
+- No Prompt 1 correction was undone:
+  - A1: the response-sampling statement stays in §6.6.1, the note to `tab:response_spread` and §7.7, with short versions in §6.4 and §7.1. The LendingClub LR DEV/HO ranking note is in §6.2 and §7.1. The `tab:robustness` row is unchanged.
+  - A2: the overlap wording is in §6.5.1. A3: "0.13 to 0.42" is in §6.6.1. A4: the union-denominator explanation is in §6.6.1.
+  - A6: "unscreened 1,959-feature universe" appears at every mention of the timing measurement (§3.1, §6.7, §7.5, Appendix F).
+
+### Step 1: edits
+
+**Method.** Sections 2–8 were rewritten from the post-Prompt-1 text. A build script took every table, figure and equation verbatim from the Prompt 1 commit and placed them by label into the new running text. Table bodies, figure code and equations are therefore byte-identical (S3); only captions and the table-note sentences listed below changed.
+
+**B1, each caveat stated once.**
+- HO is calendar-later only for LendingClub and Stability 2024, and a recency-based covariate-shift holdout for Home Credit.
+  - Home: §5.1 and §5.2.
+  - Replaced by pointers in §3.3, §6.6.2 and §7.7.
+  - Deleted from the captions of Figure 1 and `tab:datasets`.
+- The HO-rule comparison is descriptive, and its intervals are not adjusted for selection.
+  - Home: §5.6.
+  - Kept in the captions of `tab:primary_results`, `tab:confirmatory` and `fig:primary`.
+  - Removed from §6.1, §7.1 and §8; §7.7 keeps a one-clause pointer.
+- The protocol evolved with knowledge of held-out results.
+  - Home: §4.6.
+  - Pointers in §4.1, §5.2, §5.6 and §5.7; one clause in §7.7.
+  - Deleted from the Figure 1 caption.
+- The materiality bar of 0.010.
+  - Home: §5.6, where it is named "the materiality bar" once; everywhere else it is "the bar".
+  - The value was removed from the captions of `tab:robustness`, `tab:mechanical` and `tab:response_spread` and from the notes, which now point to §5.6.
+- Balanced class weights make the Brier score uninformative about calibration.
+  - Home: §5.5.
+  - Pointers in §6.6.2 and in the `tab:secondary` caption; §7.7 keeps a short clause.
+- Nogueira values are not comparable across universe sizes $d$.
+  - Home: §3.4.
+  - Pointers in §6.6.1 and in the `fig:stability` caption.
+  - Removed from the `tab:response_lists` caption; the `tab:stability` note was shortened.
+
+**B2, leader-rule names.** §5.6 defines the three names:
+- the *HO rule*;
+- the *DEV rule*;
+- the *mixed rule*, which pairs the DEV-rule LLM-assisted leader with the HO-rule classical leader and is the least favourable pairing for the LLM-assisted family.
+
+Every variant in the text and captions of Sections 2–8 was replaced: "held-out rule" and "held-out-rule", "development rule" and "development-rule", "most adversarial pairing". The `tab:confirmatory` caption now reads "Held-out (HO) comparison under the DEV rule". Counts are under P3 below.
+
+**B3, Results restructured.**
+- New order:
+  - §6.1 Headline comparison: four paragraphs of 119, 119, 84 and 112 words, covering the HO rule, the DEV rule, the mixed rule, and why the rules are not independent checks.
+  - §6.2 Development-to-holdout degradation (new, `subsec:dev_to_ho`). It carries the 0.008–0.022 against −0.010 to +0.012 finding, its link to the agreement between the rules, and the LendingClub LR note from Prompt 1.
+  - §6.3 Within-family comparison (new, `subsec:within_family`). It is the condensed paragraph: means of the non-floor selectors, pure LLM against the hybrids, and the LLM then Boruta budget note.
+  - §6.4 Robustness, §6.5 What drives the result, §6.6 Stability, drift and secondary metrics, §6.7 Scalability and cost.
+- The protected-attributes paragraph moved to the new §7.6 "Governance and protected attributes" (`subsec:governance`), with every fact. The protected-attribute sentence of the Limitations was merged into it.
+- The protected-attribute paragraph of §4.4 was tightened and kept.
+
+**B4, table moves.**
+- `tab:response_lists` is now Table F.4 and `tab:cost_structure` Table F.5, both at the end of `app:robustness`.
+- Their one-sentence summaries with `\ref` pointers stay in §6.6.1 and §6.7.
+- Tables before `\appendix`: 13 → 11.
+- Further moves are only proposed (Author decisions).
+
+**B5, Discussion.**
+- §7.1 was rewritten to interpret, with at most one number per claim and a table pointer.
+- §6.7 now reports measurements only: timing, tokens and cost, hardware and memory, plus the Table F.5 pointer.
+- The cost-structure interpretation moved to §7.5.
+- The 522 s / 21 s sentence appears only in §6.7. §3.1 and §7.5 refer to the measurement without its numbers and keep "unscreened 1,959-feature universe".
+
+**B6, Conclusion.** 585 → 348 words, in the order findings, practical implication, research implication, next steps. It adds no new claim.
+
+**B7, style.**
+- No sentence of Sections 2–8 exceeds 45 words; in the baseline 125 did, and 46 exceeded 60.
+- In the running text, ΔAUC values were rounded to three decimals, and AUC stays at four:
+  - obfuscation: −0.0012, +0.0042, −0.0290 and −0.0310 become −0.001, +0.004, 0.029 and 0.031;
+  - lineage-only arm: −0.0064 to +0.0066, +0.0086 and −0.0018 become −0.006 to +0.007, +0.009 and −0.002;
+  - voting: +0.0020 to +0.0129 becomes +0.002 to +0.013;
+  - fold-response margins: 0.0008 to 0.0083 becomes 0.001 to 0.008, and 0.0117 to 0.0192 becomes 0.012 to 0.019.
+  - The four-decimal exceptions are listed under Author decisions.
+- LR is defined at first use in the running text (§5.3).
+- Tightened without dropping facts:
+  - §4.1 with its list: 538 → 311 words;
+  - §5.1: 1,014 → 851;
+  - §5.2: 685 → 534;
+  - §4.4: 1,374 → 794.
+  - Also §6.1: 1,324 → 434; §7.1: 738 → 455; §7.7: 992 → 590.
+
+**B8, captions.** Method descriptions that repeat the text were cut, keeping what is needed to read each float:
+- Figure 1: dropped the ordering-index sentence and the earlier-inspection caveat.
+- `tab:methods`, `tab:datasets` and `fig:scale`: shortened.
+- `tab:primary_results`, `tab:confirmatory` and `fig:primary`: the HO-rule caveat kept (B1).
+- `tab:full_matrix`, `tab:robustness`, `tab:obfuscation`, `tab:mechanical`, `tab:stability`, `tab:response_spread`, `tab:response_lists`, `fig:stability` and `tab:secondary`: shortened.
+- The `tab:stability` notes [a] and [b] and the second `tab:response_spread` note were shortened. In that note, "materiality bar" became "bar" and "held-out-rule" became "HO-rule".
+- All five AI-assistance notes are unchanged (S5).
+
+**Appendices.** Only duplicated caveats were removed:
+- "read against the materiality bar of 0.010" in the captions of `tab:lc_maturity` and `tab:diversity`, now a pointer to §5.6;
+- the clause "so this difference describes the resolved-loan population and should be read with that construction in mind" in the LendingClub paragraph of `app:robustness`.
+
+### Step 2: self-check
+
+Run with `python3 tools/check_p2.py --p1-commit 901c263 --compile-dir <scratch>`.
+
+| Check | Result | Evidence |
+|---|---|---|
+| S1 | PASS | pdflatex twice, exit 0 on both passes. 0 Overfull `\hbox` (baseline 0); 1 Underfull `\hbox`, as in the baseline. No undefined references or citations. 33 pages (baseline 36). Pass 2 reports "Label(s) may have changed", as the baseline does; pass 3 writes an identical `.aux` with no warning. |
+| S2 | PASS | All 83 baseline labels exist. The new labels are `subsec:dev_to_ho`, `subsec:within_family` and `subsec:governance`, none duplicated. The 55 cite keys are the same set. `thebibliography` is byte-identical. |
+| S3 | PASS | All 25 table bodies (19 main, 6 supplement) equal their state at the Prompt 1 commit, matched by label. The two moved tables are included. |
+| S4 | PASS | Tokens absent from baseline main + supplement: +0.002, +0.007, −0.001, −0.002, −0.006, 0.012, 0.019 and 0.029 (new in Prompt 2), plus the seven from Prompt 1. All are under Derived numbers. |
+| S5 | PASS | 14 R6 blocks are identical to the baseline. |
+| P1 | PASS | Sections 2–8 went from 15,824 to 11,757 words, 25.7% shorter. This is above the 25% floor but below the 30% target (Author decisions). |
+| P2 | PASS | Every baseline Sections 2–8 token still occurs in the document except `0.027`, `29` and `0.14`, which are listed under "Removed duplicates" below with the place where each value survives. |
+| P3 | PASS | Counts in the text, captions and table notes of Sections 2–8 are within the limits: "materiality bar" 2 (≤ 6), "covariate-shift" 1 (≤ 3), "not adjusted" 4 (≤ 4), "descriptive" 5 (≤ 6). "held-out rule", "development rule", "development-rule" and "most adversarial" are all 0. Counting table cells as well, "development rule" is 1: a cell of the `tab:robustness` row added in Prompt 1, which R3 protects (Unresolved). |
+| P4 | PASS | 11 table/table* environments before `\appendix`. `tab:response_lists` and `tab:cost_structure` are in `app:robustness` (Tables F.4 and F.5). Every `\ref` resolves. |
+| P5 | PASS | `\label{subsec:dev_to_ho}` exists. The §6.1 paragraphs are 119, 119, 84 and 112 words. All nine protected-attribute facts are in §7.6, and none is left in the Results. |
+| P6 | PASS | No sentence of Sections 2–8 exceeds 60 words, and none exceeds 45, so there is nothing to justify. The four long sentences left in the document are in the Introduction, which is reserved for Prompt 3. |
+| P7 | PASS | The Conclusion is 348 words. In Sections 2–8, "522" occurs only in §6.7 (`subsec:cost_runtime`). |
+| P8 | PASS | Introduction, abstract, keywords and highlights block are byte-identical to the Prompt 1 commit. |
+
+### Removed duplicates
+
+- `0.027`: the unsigned Home Credit LR mixed-rule margin ("mRMR by 0.021 and 0.027", baseline §7.1). The summary sentence was dropped because the three rule paragraphs of §6.1 carry each value. It survives as −0.027 in §6.1 (mixed-rule paragraph), in `tab:robustness` and in the abstract.
+- `29`: "about 29%" of the 307,511 Home Credit applications (baseline §5.1). It was merged with the exact figure, which survives as "28.7 per cent" in §5.1 (moved there from §7.7, with 219,145 of 307,511).
+- `0.14`: not a duplicate. It is the erroneous "0.14 to 0.42" corrected in Prompt 1 (A3); the correct 0.13 is in §6.6.1.
+
+### Before/after metrics
+
+| Metric | Baseline | After Prompt 1 | After Prompt 2 |
+|---|---|---|---|
+| Words, Sections 2–8 | 15,824 | 16,324 | 11,757 (−25.7%) |
+| Related Work | 479 | 479 | 426 |
+| Background | 786 | 795 | 702 |
+| Methodology | 3,048 | 3,048 | 2,031 |
+| Experimental Setup | 3,871 | 3,871 | 3,149 |
+| Results | 4,229 | 4,600 | 3,149 |
+| Discussion | 2,826 | 2,946 | 1,952 |
+| Conclusion | 585 | 585 | 348 |
+| Words, Sections 1–8 incl. back matter (measure.py) | 16,889 | 17,389 | 12,822 |
+| Introduction (unchanged) | 898 | 898 | 898 |
+| Abstract | 243 | 243 | 243 |
+| Sentences > 45 / > 60 words, Sections 2–8 | 125 / 46 | – | 0 / 0 |
+| Sentences > 45 / > 60 words, Sections 1–8 | 129 / 49 | 126 / 46 | 4 / 3 (all in the Introduction) |
+| "materiality bar", S2–8 text + captions | 16 | – | 2 |
+| "covariate-shift" | 5 | – | 1 |
+| "not adjusted" | 2 | – | 4 |
+| "descriptive" | 10 | – | 5 |
+| "held-out rule" / "development rule" / "development-rule" / "most adversarial" | 1 / 6 / 5 / 4 | – | 0 / 0 / 0 / 0 |
+| Tables before `\appendix` | 13 | 13 | 11 |
+| Pages | 36 | 37 | 33 |
+| Overfull / Underfull `\hbox` | 0 / 1 | 0 / 1 | 0 / 1 |
+
 ## Prompt 3
 
 ## Derived numbers
@@ -263,13 +428,33 @@ The computations use the four-decimal values printed in the baseline tables. The
 | 0.003 | §6.4.1, `tab:robustness`, note to `tab:response_spread` | largest distance of a full-DEV response outside its fold range, excluding LendingClub LR: Home Credit LR 0.7436 − 0.7410 = 0.0026 ≤ 0.003. The other four cases lie inside their ranges: Home Credit CatBoost 0.7935 in 0.7926–0.7998, LendingClub CatBoost 0.7335 in 0.7324–0.7362, Stability 2024 LR 0.8344 in 0.8300–0.8395, Stability 2024 CatBoost 0.8784 in 0.8740–0.8832 | 0.743635 − 0.741038 = 0.002597 |
 | 0.13 | §6.4.1 (A3) | narrowest fold-pair spread of a pure LLM list, LendingClub CatBoost: Max 0.538 − Min 0.404 = 0.134 (`tab:stability`). The other widths are 0.417, 0.278 and 0.350, so the range is 0.13 to 0.42 | not needed (printed table) |
 
-These are the only numeric tokens absent from the baseline (S4). Two related changes are not new tokens:
+These were the only numeric tokens absent from the baseline after Prompt 1 (S4). Section numbers in these rows follow the Prompt 1 numbering; after Prompt 2 the response-sampling text is in §6.6.1 and the robustness text in §6.4. Two related changes are not new tokens:
 - The number word "thirteen" in `subsec:robustness` is the twelve baseline rows plus the new one.
 - Printed values reused in new sentences without change: 0.7402, 0.7436, 0.7935, 0.7335, 0.8344, 0.8784, 0.7106, 0.7181, 0.7098, 0.6989, 0.0075, 11, 12, 18, 24, 26, 33, 1,068, 1,959 and 100.
+
+**Prompt 2.** Every new number comes from rounding a printed four-decimal ΔAUC to three decimals in the running text (B7). No other arithmetic was done.
+
+| Number | Used in (Prompt 2 numbering) | Computation from printed values | Full precision / check |
+|---|---|---|---|
+| −0.001 | §6.5.1 | arm A LR Δ −0.0012 (`tab:obfuscation`) → −0.001 | – |
+| +0.004 | §6.5.1 | arm A CatBoost Δ +0.0042 → +0.004 (token already in baseline) | – |
+| 0.029, 0.031 | §6.5.1 ("falls by") | arm B Δ −0.0290 and −0.0310 → 0.029 and 0.031 (0.031 already in baseline) | – |
+| −0.006, +0.007 | §6.5.2 | range of mechanical-minus-cached Δ, −0.0064 to +0.0066 (`tab:mechanical`) → −0.006 to +0.007 | – |
+| +0.009 | §6.5.2 | widest interval bound +0.0086 (`tab:mechanical`, Stability 2024 LR) → +0.009 (token already in baseline) | – |
+| −0.002 | §6.5.2 | stable core + LLM fill Δ −0.0018 (`tab:mechanical`) → −0.002 | – |
+| +0.002, +0.013 | §7.2 | voting ΔAUC range +0.0020 to +0.0129 (`tab:voting_cross`) → +0.002 to +0.013 (+0.013 already in baseline) | – |
+| 0.001, 0.008 | §6.4, §6.6.1 | fold-response margins over IV then Boruta, 0.0008 to 0.0083 (Prompt 1 derived) → 0.001 to 0.008 (both tokens already in baseline) | 0.000833 → 0.001; 0.008298 → 0.008 |
+| 0.012, 0.019 | §6.4, §6.6.1 | fold-response margins over RFE CatBoost, 0.0117 to 0.0192 (Prompt 1 derived) → 0.012 to 0.019 | 0.011755 → 0.012; 0.019220 → 0.019. At three decimals the rounding discrepancy noted for 0.0117 in Prompt 1 disappears. |
 
 ## Unresolved
 
 None in Prompt 1. The abstract and Introduction mentions of the timing measurement are deferred to Prompt 3 by instruction (A6), not unresolved.
+
+**Prompt 2.**
+- **Leader-rule wording inside a table cell.** "development rule" survives once, inside a table cell: the Result cell of the `tab:robustness` row added in Prompt 1 ends "... 0.0117 to 0.0192 under the development rule". R3 (no change to existing cells) and S3 (table bodies equal their Prompt 1 state) forbid renaming it to "DEV rule".
+  - In the text, captions and notes of Sections 2–8, which the prompt allows me to edit, all four banned phrases count 0, so P3 is marked PASS on that scope.
+  - If P3 is read as covering table cells too, this one cell is the only miss. The fix is a one-word change to that cell ("development rule" → "DEV rule"), which needs the authors' approval under R3.
+  - Two more table cells keep the older wording but fall outside P3's phrase list: "Held-out-rule margins in five cases" in `tab:robustness` (a baseline cell) and "development-rule comparison" in `tab:stages` (appendix). R3 protects both.
 
 ## Author decisions
 
@@ -284,3 +469,39 @@ None in Prompt 1. The abstract and Introduction mentions of the timing measureme
 9. **Scope of A6.** "Sections 2–8 and the appendices" was read to include the Section 3.1 sentence that cites the measurement without numbers. The abstract and Introduction are unchanged, as instructed.
 10. **PDFs and zip not rebuilt.** `submission/manuscript.pdf` and `submission/manuscript_source.zip` were not rebuilt, because S7 restricts the changed files. They now lag `submission/manuscript.tex` and should be rebuilt together after Prompt 3. The compiled PDF of this state is only in the scratchpad (37 pages; the baseline had 36).
 11. **Word-count span.** "Sections 1–8" follows the prompt's explicit span, `\section{Introduction}` to `\appendix`, which includes the unnumbered back-matter sections. The total without them is reported alongside.
+
+**Prompt 2.**
+
+12. **Meaning of "Sections 2–8".** P1 and P3 measure the numbered sections Related Work to Conclusion. The unnumbered back matter (CRediT to Data availability) is excluded; R6 fixes it anyway.
+13. **30% target not reached.** Sections 2–8 are 25.7% shorter, above the 25% floor of P1.
+    - After four de-duplication passes the remaining text is almost entirely unique facts: dataset construction, method settings, the numbers the Results argue from, and the caveats in their home sections. Going further would have meant removing unique claims or numbers, which B1 and P1 forbid.
+    - Cutting the numbers the Results repeat from tables was considered and rejected, because the text argues from them.
+14. **Where the condensed paragraph went (B3).** B3 asks for four headline paragraphs and a separate condensed paragraph (family means, pure LLM against the hybrids, Boruta budget). The condensed paragraph is its own short subsection, §6.3 "Within-family comparison" (`subsec:within_family`), placed after `subsec:dev_to_ho` and before Robustness. §6.1 thus holds exactly the four rule paragraphs.
+15. **New Discussion subsection.** "Governance and protected attributes" is §7.6 (`subsec:governance`), placed after Deployment at scale and before Limitations. The Limitations and §4.4 point to it.
+16. **Appendix wording (B2).** The appendices keep their wording ("development-data rule" in `app:protocol`; cells of `tab:stages`), because the scope allows only duplicated caveats to be removed there. B2 applies to Sections 2–8.
+17. **Precision exceptions (B7).** These stay at four decimals in the running text:
+    - the response-sampling spreads (0.0095, 0.0092, 0.0075, 0.0296);
+    - the two shortfalls below the bar (0.0014, 0.0003);
+    - PSI, Nogueira and Jaccard values.
+
+    Rounding a spread to three decimals would turn 0.0095 into 0.010, which reads as "at the bar" when the paper's point is that it lies inside it, and the shortfalls would become 0.001 and 0.000. Table notes keep the four-decimal values that match their cells, for example 0.0008 to 0.0083 in the `tab:response_spread` note.
+18. **Proposed further table moves (not made, B4).**
+    - `tab:mechanical`: its result is one row of `tab:robustness` and one paragraph of §6.5.2.
+    - `tab:secondary`: secondary metrics are not headline results.
+    - Possibly `tab:obfuscation`: its per-arm overlaps are discussed in §6.5.1, so the text would need Appendix F pointers.
+
+    Each would bring the tables before `\appendix` to 10 or 9.
+19. **Things a reader may notice that were left unchanged, because the scope did not allow the edit:**
+    - The Introduction's roadmap sentence does not list the new §6.2 and §6.3. It is reserved for Prompt 3.
+    - The Appendix F introduction does not mention the two moved tables, which are referenced from the main text.
+    - Appendix F's "(Section~`subsec:primary_results`)" pointer for LLM then Boruta now lands on §6.1, while the note is in §6.3.
+    - Suggested for Prompt 3 or for the authors.
+20. **Stale clause removed.** "which matters for the transfer experiments" (§5.1) was deleted: the transfer experiments were removed in an earlier revision (last row of `tab:stages`), so the clause pointed at nothing.
+21. **Ambiguous antecedent kept.** In the LendingClub paragraph of §5.1, "None of them appears anywhere in the cached semantic rankings" follows the missingness breakdown (566, two, 107). It is ambiguous whether "them" means the late-introduced features or the 107 features at 60–82%. The result files (`priority_2/lc_missingness_distribution.csv`) do not settle it, so the baseline sentence order was kept. The authors should clarify.
+22. **Result file contradicts the paper (not changed).**
+    - §6.1 says the Home Credit LR mixed-rule difference (−0.027) is "reported as a point estimate, its interval not computed".
+    - `priority_2/conservative_pair_interval.csv` holds an interval for that pair ([−0.0285, −0.0250]).
+    - Adding the interval would add numbers absent from the manuscript (R2), and changing the claim is outside this prompt's scope. The authors should decide, and a referee comparing the paper with the repository would flag it.
+23. **Wording fix in §5.6.** "responses of the language model, of which there is one per case, ten on Stability 2024" became "one language-model response per case in the headline tables". The old wording ignored the five per-fold responses of Home Credit and LendingClub reported in §6.6.1 (Prompt 1 observation).
+24. **Method of the rewrite.** A scratchpad script (not part of the repository) assembled Sections 2–8 from new text templates. Floats and equations were taken verbatim from the Prompt 1 commit, and only captions and the listed note sentences were replaced; the script checked that each AI-assistance sentence survives in its caption. This is why S3 and S5 hold by construction and are also verified by `tools/check_p2.py`.
+25. **PDFs and zip, again not rebuilt.** As in Prompt 1, `submission/manuscript.pdf` and the zip are left for the rebuild after Prompt 3. The Prompt 2 build is in the scratchpad (33 pages).
