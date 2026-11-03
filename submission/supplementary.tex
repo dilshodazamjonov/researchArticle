@@ -1,0 +1,272 @@
+\documentclass[final,5p,twocolumn]{elsarticle}
+
+% ------------------------------------------------------------
+% Supplementary material for the manuscript prepared for Big Data Research (Elsevier).
+% Compile: pdflatex x2 (no bibliography).
+% ------------------------------------------------------------
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\usepackage{threeparttable}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Supplementary material for Row-Independent Feature Pre-Screening with Language Models for High-Dimensional Credit Scoring: A Frozen Evaluation on Temporal and Recency-Shift Holdouts}, pdfauthor={Dilshod A'zamjonov, Sejuti Rahman}}
+\makeatletter
+\pdfstringdefDisableCommands{\let\corref\@gobble\let\cnotenum\@empty\let\@corref\@gobble}
+\makeatother
+\newcommand{\Kfeat}{K}
+\renewcommand{\thetable}{S\arabic{table}}
+
+\journal{Big Data Research}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Supplementary material for ``Row-Independent Feature Pre-Screening with Language Models for High-Dimensional Credit Scoring: A Frozen Evaluation on Temporal and Recency-Shift Holdouts''}
+
+\author[aff1,aff3]{Dilshod A'zamjonov\corref{cor1}}
+\ead{d.azamjonov@newuu.uz}
+
+\author[aff2]{Sejuti Rahman}
+\ead{sejuti@gmail.com}
+
+\cortext[cor1]{Corresponding author}
+
+\address[aff1]{Department of Engineering, New Uzbekistan University, 1 Movarounnahr Street, Mirzo Ulugbek District, Tashkent, Uzbekistan}
+\address[aff2]{Department of Computing, New Uzbekistan University, 1 Movarounnahr Street, Mirzo Ulugbek District, Tashkent, Uzbekistan}
+\address[aff3]{Central Bank of the Republic of Uzbekistan, 6 Islam Karimov Street, Tashkent 100001, Uzbekistan}
+
+\end{frontmatter}
+
+\section*{Headline subsets}
+
+This supplement lists the twelve headline subsets of the main text: for each dataset--backbone case, the features selected by the frozen full-DEV refit of the LLM-assisted family leader and of the classical family leader, in the order the selector produced them ($\Kfeat=20$ for logistic regression, $\Kfeat=40$ for CatBoost). Each dataset takes two tables, the first giving ranks 1 to 20 of all four subsets and the second ranks 21 to 40 of the two CatBoost subsets: Tables~\ref{tab:subsets_homecredit} and \ref{tab:subsets_homecredit_b} for Home Credit, Tables~\ref{tab:subsets_lendingclub} and \ref{tab:subsets_lendingclub_b} for LendingClub v2, and Tables~\ref{tab:subsets_stability} and \ref{tab:subsets_stability_b} for Stability 2024. For pure LLM the order is that of the cached full-DEV ranking; on Stability 2024 one ranking served both backbones, so its logistic-regression subset is the first twenty names of its CatBoost subset. Feature names are those of the engineered universes described in the main text; on Home Credit the three external scores occupy the first three ranks of the pure LLM list. The lists are also provided as \texttt{headline\_subsets.csv} in the repository.
+
+\begin{table*}[htbp]
+\centering
+\scriptsize
+\begin{threeparttable}
+\caption{Home Credit, ranks 1 to 20: full-DEV subsets of the two family leaders under each backbone (primary held-out comparison of the main text), in selector order. The two logistic-regression subsets share 4 of 20 features; the two CatBoost subsets share 16 of 40 (continued in Table~\ref{tab:subsets_homecredit_b}).}
+\label{tab:subsets_homecredit}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{@{}rL{40mm}L{40mm}L{40mm}L{40mm}@{}}
+\toprule
+Rank & LR: Stable core + LLM fill (LLM-assisted) & LR: mRMR (classical) & CatBoost: Pure LLM (LLM-assisted) & CatBoost: RFE CatBoost (classical) \\
+\midrule
+1 & \texttt{EXT\_\allowbreak SOURCE\_\allowbreak 2} & \texttt{EXT\_\allowbreak SOURCE\_\allowbreak 3} & \texttt{EXT\_\allowbreak SOURCE\_\allowbreak 3} & \texttt{EXT\_\allowbreak SOURCE\_\allowbreak 2} \\
+2 & \texttt{EXT\_\allowbreak SOURCE\_\allowbreak 3} & \texttt{EXT\_\allowbreak SOURCE\_\allowbreak 2} & \texttt{EXT\_\allowbreak SOURCE\_\allowbreak 2} & \texttt{EXT\_\allowbreak SOURCE\_\allowbreak 3} \\
+3 & \texttt{PREV\_\allowbreak INTEREST\_\allowbreak ESTIMATE\_\allowbreak MAX} & \texttt{CODE\_\allowbreak GENDER} & \texttt{EXT\_\allowbreak SOURCE\_\allowbreak 1} & \texttt{EXT\_\allowbreak SOURCE\_\allowbreak 1} \\
+4 & \texttt{EXT\_\allowbreak SOURCE\_\allowbreak 1} & \texttt{CC\_\allowbreak CNT\_\allowbreak DRAWINGS\_\allowbreak ATM\_\allowbreak CURRENT\_\allowbreak MEAN} & \texttt{DAYS\_\allowbreak BIRTH} & \texttt{PREV\_\allowbreak INTEREST\_\allowbreak ESTIMATE\_\allowbreak MAX} \\
+5 & \texttt{DAYS\_\allowbreak EMPLOYED} & \texttt{POS\_\allowbreak LATE\_\allowbreak PAYMENT\_\allowbreak MEAN} & \texttt{DAYS\_\allowbreak EMPLOYED} & \texttt{DAYS\_\allowbreak BIRTH} \\
+6 & \texttt{BURO\_\allowbreak DEBT\_\allowbreak CREDIT\_\allowbreak DIFF\_\allowbreak MIN} & \texttt{DEF\_\allowbreak 30\_\allowbreak CNT\_\allowbreak SOCIAL\_\allowbreak CIRCLE} & \texttt{OCCUPATION\_\allowbreak TYPE} & \texttt{INSTAL\_\allowbreak AMT\_\allowbreak PAYMENT\_\allowbreak SUM} \\
+7 & \texttt{INSTAL\_\allowbreak IS\_\allowbreak LATE\_\allowbreak MEAN} & \texttt{PREV\_\allowbreak AMT\_\allowbreak DOWN\_\allowbreak PAYMENT\_\allowbreak SUM} & \texttt{NAME\_\allowbreak INCOME\_\allowbreak TYPE} & \texttt{INSTAL\_\allowbreak IS\_\allowbreak LATE\_\allowbreak MEAN} \\
+8 & \texttt{INSTAL\_\allowbreak PAYMENT\_\allowbreak DIFF\_\allowbreak MEAN} & \texttt{FLAG\_\allowbreak WORK\_\allowbreak PHONE} & \texttt{NAME\_\allowbreak EDUCATION\_\allowbreak TYPE} & \texttt{DAYS\_\allowbreak EMPLOYED} \\
+9 & \texttt{PREV\_\allowbreak INTEREST\_\allowbreak ESTIMATE\_\allowbreak VAR} & \texttt{BURO\_\allowbreak AMT\_\allowbreak CREDIT\_\allowbreak SUM\_\allowbreak LIMIT\_\allowbreak MIN} & \texttt{NAME\_\allowbreak FAMILY\_\allowbreak STATUS} & \texttt{AMT\_\allowbreak CREDIT} \\
+10 & \texttt{DAYS\_\allowbreak REGISTRATION} & \texttt{CC\_\allowbreak AMT\_\allowbreak DRAWINGS\_\allowbreak ATM\_\allowbreak CURRENT\_\allowbreak MIN} & \texttt{CODE\_\allowbreak GENDER} & \texttt{AMT\_\allowbreak ANNUITY} \\
+11 & \texttt{POS\_\allowbreak SK\_\allowbreak DPD\_\allowbreak DEF\_\allowbreak MEAN} & \texttt{EXT\_\allowbreak SOURCE\_\allowbreak 1} & \texttt{AMT\_\allowbreak CREDIT} & \texttt{AMT\_\allowbreak GOODS\_\allowbreak PRICE} \\
+12 & \texttt{BURO\_\allowbreak DEBT\_\allowbreak CREDIT\_\allowbreak DIFF\_\allowbreak MEAN} & \texttt{PREV\_\allowbreak RATE\_\allowbreak INTEREST\_\allowbreak PRIMARY\_\allowbreak VAR} & \texttt{AMT\_\allowbreak GOODS\_\allowbreak PRICE} & \texttt{INSTAL\_\allowbreak DAYS\_\allowbreak DIFF\_\allowbreak MAX} \\
+13 & \texttt{PREV\_\allowbreak INTEREST\_\allowbreak ESTIMATE\_\allowbreak MEAN} & \texttt{WEEKDAY\_\allowbreak APPR\_\allowbreak PROCESS\_\allowbreak START} & \texttt{AMT\_\allowbreak ANNUITY} & \texttt{PREV\_\allowbreak DAYS\_\allowbreak FIRST\_\allowbreak DUE\_\allowbreak SUM} \\
+14 & \texttt{CC\_\allowbreak CNT\_\allowbreak DRAWINGS\_\allowbreak ATM\_\allowbreak CURRENT\_\allowbreak MEAN} & \texttt{PREV\_\allowbreak DAYS\_\allowbreak FIRST\_\allowbreak DRAWING\_\allowbreak VAR} & \texttt{BURO\_\allowbreak DEBT\_\allowbreak RATIO\_\allowbreak MAX} & \texttt{CODE\_\allowbreak GENDER} \\
+15 & \texttt{DAYS\_\allowbreak BIRTH} & \texttt{COMMONAREA\_\allowbreak AVG} & \texttt{BURO\_\allowbreak DEBT\_\allowbreak RATIO\_\allowbreak MEAN} & \texttt{BURO\_\allowbreak DEBT\_\allowbreak RATIO\_\allowbreak SUM} \\
+16 & \texttt{AMT\_\allowbreak CREDIT} & \texttt{FLAG\_\allowbreak CONT\_\allowbreak MOBILE} & \texttt{BURO\_\allowbreak DAYS\_\allowbreak CREDIT\_\allowbreak MEAN} & \texttt{BURO\_\allowbreak DEBT\_\allowbreak RATIO\_\allowbreak MAX} \\
+17 & \texttt{AMT\_\allowbreak GOODS\_\allowbreak PRICE} & \texttt{FLAG\_\allowbreak DOCUMENT\_\allowbreak 3} & \texttt{BURO\_\allowbreak DAYS\_\allowbreak CREDIT\_\allowbreak UPDATE\_\allowbreak MEAN} & \texttt{INSTAL\_\allowbreak DAYS\_\allowbreak INSTALMENT\_\allowbreak VAR} \\
+18 & \texttt{AMT\_\allowbreak ANNUITY} & \texttt{PREV\_\allowbreak NFLAG\_\allowbreak LAST\_\allowbreak APPL\_\allowbreak IN\_\allowbreak DAY\_\allowbreak MEAN} & \texttt{BURO\_\allowbreak DAYS\_\allowbreak CREDIT\_\allowbreak ENDDATE\_\allowbreak MEAN} & \texttt{PREV\_\allowbreak APPLICATION\_\allowbreak DIFF\_\allowbreak MAX} \\
+19 & \texttt{BURO\_\allowbreak DEBT\_\allowbreak RATIO\_\allowbreak MAX} & \texttt{AMT\_\allowbreak REQ\_\allowbreak CREDIT\_\allowbreak BUREAU\_\allowbreak QRT} & \texttt{BURO\_\allowbreak DAYS\_\allowbreak CREDIT\_\allowbreak MAX} & \texttt{PREV\_\allowbreak DAYS\_\allowbreak LAST\_\allowbreak DUE\_\allowbreak 1ST\_\allowbreak VERSION\_\allowbreak MAX} \\
+20 & \texttt{BURO\_\allowbreak DEBT\_\allowbreak RATIO\_\allowbreak MEAN} & \texttt{NAME\_\allowbreak HOUSING\_\allowbreak TYPE} & \texttt{BURO\_\allowbreak DAYS\_\allowbreak CREDIT\_\allowbreak MIN} & \texttt{BURO\_\allowbreak DAYS\_\allowbreak CREDIT\_\allowbreak ENDDATE\_\allowbreak MAX} \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table*}
+
+\begin{table*}[htbp]
+\centering
+\scriptsize
+\begin{threeparttable}
+\caption{Home Credit, ranks 21 to 40 of the two CatBoost subsets of Table~\ref{tab:subsets_homecredit}.}
+\label{tab:subsets_homecredit_b}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{@{}rL{80mm}L{80mm}@{}}
+\toprule
+Rank & CatBoost: Pure LLM (LLM-assisted) & CatBoost: RFE CatBoost (classical) \\
+\midrule
+21 & \texttt{BURO\_\allowbreak DAYS\_\allowbreak ENDDATE\_\allowbreak FACT\_\allowbreak MEAN} & \texttt{NAME\_\allowbreak EDUCATION\_\allowbreak TYPE} \\
+22 & \texttt{BURO\_\allowbreak DEBT\_\allowbreak CREDIT\_\allowbreak DIFF\_\allowbreak MEAN} & \texttt{BURO\_\allowbreak DEBT\_\allowbreak CREDIT\_\allowbreak DIFF\_\allowbreak SUM} \\
+23 & \texttt{BURO\_\allowbreak DEBT\_\allowbreak RATIO\_\allowbreak VAR} & \texttt{INSTAL\_\allowbreak PAYMENT\_\allowbreak RATIO\_\allowbreak MEAN} \\
+24 & \texttt{BURO\_\allowbreak AMT\_\allowbreak CREDIT\_\allowbreak SUM\_\allowbreak DEBT\_\allowbreak MEAN} & \texttt{BURO\_\allowbreak AMT\_\allowbreak CREDIT\_\allowbreak SUM\_\allowbreak MAX} \\
+25 & \texttt{BURO\_\allowbreak AMT\_\allowbreak CREDIT\_\allowbreak SUM\_\allowbreak DEBT\_\allowbreak SUM} & \texttt{CC\_\allowbreak LIMIT\_\allowbreak USE\_\allowbreak MEAN} \\
+26 & \texttt{BURO\_\allowbreak AMT\_\allowbreak CREDIT\_\allowbreak SUM\_\allowbreak LIMIT\_\allowbreak MEAN} & \texttt{PREV\_\allowbreak INTEREST\_\allowbreak ESTIMATE\_\allowbreak SUM} \\
+27 & \texttt{BURO\_\allowbreak AMT\_\allowbreak CREDIT\_\allowbreak SUM\_\allowbreak LIMIT\_\allowbreak SUM} & \texttt{INSTAL\_\allowbreak AMT\_\allowbreak PAYMENT\_\allowbreak MAX} \\
+28 & \texttt{BURO\_\allowbreak AMT\_\allowbreak CREDIT\_\allowbreak SUM\_\allowbreak DEBT\_\allowbreak VAR} & \texttt{BURO\_\allowbreak DAYS\_\allowbreak CREDIT\_\allowbreak MEAN} \\
+29 & \texttt{BURO\_\allowbreak DAYS\_\allowbreak CREDIT\_\allowbreak UPDATE\_\allowbreak MAX} & \texttt{DAYS\_\allowbreak REGISTRATION} \\
+30 & \texttt{BURO\_\allowbreak DAYS\_\allowbreak CREDIT\_\allowbreak ENDDATE\_\allowbreak MAX} & \texttt{CC\_\allowbreak CNT\_\allowbreak DRAWINGS\_\allowbreak CURRENT\_\allowbreak VAR} \\
+31 & \texttt{BURO\_\allowbreak DAYS\_\allowbreak CREDIT\_\allowbreak UPDATE\_\allowbreak VAR} & \texttt{REGION\_\allowbreak POPULATION\_\allowbreak RELATIVE} \\
+32 & \texttt{BURO\_\allowbreak DAYS\_\allowbreak CREDIT\_\allowbreak VAR} & \texttt{POS\_\allowbreak TOTAL\_\allowbreak INSTALMENT\_\allowbreak PROG\_\allowbreak MEAN} \\
+33 & \texttt{BURO\_\allowbreak CREDIT\_\allowbreak DURATION\_\allowbreak MEAN} & \texttt{PREV\_\allowbreak DAYS\_\allowbreak LAST\_\allowbreak DUE\_\allowbreak MAX} \\
+34 & \texttt{BURO\_\allowbreak CREDIT\_\allowbreak DURATION\_\allowbreak MAX} & \texttt{CC\_\allowbreak CNT\_\allowbreak DRAWINGS\_\allowbreak ATM\_\allowbreak CURRENT\_\allowbreak MEAN} \\
+35 & \texttt{BURO\_\allowbreak CREDIT\_\allowbreak DURATION\_\allowbreak VAR} & \texttt{DAYS\_\allowbreak ID\_\allowbreak PUBLISH} \\
+36 & \texttt{BURO\_\allowbreak AMT\_\allowbreak ANNUITY\_\allowbreak SUM} & \texttt{BURO\_\allowbreak DEBT\_\allowbreak RATIO\_\allowbreak MEAN} \\
+37 & \texttt{BURO\_\allowbreak CNT\_\allowbreak CREDIT\_\allowbreak PROLONG\_\allowbreak MEAN} & \texttt{INSTAL\_\allowbreak PAYMENT\_\allowbreak DIFF\_\allowbreak MAX} \\
+38 & \texttt{BURO\_\allowbreak CNT\_\allowbreak CREDIT\_\allowbreak PROLONG\_\allowbreak MAX} & \texttt{OWN\_\allowbreak CAR\_\allowbreak AGE} \\
+39 & \texttt{BURO\_\allowbreak CNT\_\allowbreak CREDIT\_\allowbreak PROLONG\_\allowbreak SUM} & \texttt{NAME\_\allowbreak FAMILY\_\allowbreak STATUS} \\
+40 & \texttt{INSTAL\_\allowbreak PAYMENT\_\allowbreak RATIO\_\allowbreak MEAN} & \texttt{BURO\_\allowbreak DEBT\_\allowbreak CREDIT\_\allowbreak DIFF\_\allowbreak MIN} \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table*}
+
+\begin{table*}[htbp]
+\centering
+\scriptsize
+\begin{threeparttable}
+\caption{LendingClub v2, ranks 1 to 20: full-DEV subsets of the two family leaders under each backbone (primary held-out comparison of the main text), in selector order. The two logistic-regression subsets share 4 of 20 features; the two CatBoost subsets share 21 of 40 (continued in Table~\ref{tab:subsets_lendingclub_b}).}
+\label{tab:subsets_lendingclub}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{@{}rL{40mm}L{40mm}L{40mm}L{40mm}@{}}
+\toprule
+Rank & LR: Pure LLM (LLM-assisted) & LR: IV then Boruta (classical) & CatBoost: LLM then mRMR (LLM-assisted) & CatBoost: IV then Boruta (classical) \\
+\midrule
+1 & \texttt{fico\_\allowbreak mean} & \texttt{term\_\allowbreak home\_\allowbreak ownership} & \texttt{term\_\allowbreak 60 months} & \texttt{term\_\allowbreak home\_\allowbreak ownership} \\
+2 & \texttt{fico\_\allowbreak band} & \texttt{term\_\allowbreak verification\_\allowbreak status} & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths\_\allowbreak share} & \texttt{term\_\allowbreak verification\_\allowbreak status} \\
+3 & \texttt{loan\_\allowbreak to\_\allowbreak income} & \texttt{term} & \texttt{dti} & \texttt{term} \\
+4 & \texttt{dti} & \texttt{term\_\allowbreak months} & \texttt{fico\_\allowbreak mean} & \texttt{term\_\allowbreak months} \\
+5 & \texttt{annual\_\allowbreak inc} & \texttt{term\_\allowbreak x\_\allowbreak loan\_\allowbreak to\_\allowbreak income} & \texttt{term\_\allowbreak 36 months} & \texttt{term\_\allowbreak x\_\allowbreak loan\_\allowbreak to\_\allowbreak income} \\
+6 & \texttt{loan\_\allowbreak amnt} & \texttt{fico\_\allowbreak band\_\allowbreak x\_\allowbreak term} & \texttt{term\_\allowbreak home\_\allowbreak ownership\_\allowbreak 60 months\_\allowbreak \_\allowbreak RENT} & \texttt{fico\_\allowbreak band\_\allowbreak x\_\allowbreak term} \\
+7 & \texttt{term} & \texttt{loan\_\allowbreak amnt\_\allowbreak to\_\allowbreak income} & \texttt{term\_\allowbreak x\_\allowbreak loan\_\allowbreak to\_\allowbreak income} & \texttt{loan\_\allowbreak amnt\_\allowbreak to\_\allowbreak income} \\
+8 & \texttt{home\_\allowbreak ownership} & \texttt{loan\_\allowbreak to\_\allowbreak income} & \texttt{fico\_\allowbreak band\_\allowbreak x\_\allowbreak term\_\allowbreak near\_\allowbreak prime\_\allowbreak \_\allowbreak 60 months} & \texttt{loan\_\allowbreak to\_\allowbreak income} \\
+9 & \texttt{verification\_\allowbreak status} & \texttt{loan\_\allowbreak to\_\allowbreak income\_\allowbreak x\_\allowbreak fico} & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths\_\allowbreak per\_\allowbreak total\_\allowbreak acc} & \texttt{loan\_\allowbreak to\_\allowbreak income\_\allowbreak x\_\allowbreak fico} \\
+10 & \texttt{purpose} & \texttt{fico\_\allowbreak mean} & \texttt{term\_\allowbreak home\_\allowbreak ownership\_\allowbreak 36 months\_\allowbreak \_\allowbreak MORTGAGE} & \texttt{fico\_\allowbreak mean} \\
+11 & \texttt{total\_\allowbreak bc\_\allowbreak limit} & \texttt{fico\_\allowbreak midpoint\_\allowbreak scaled} & \texttt{fico\_\allowbreak range\_\allowbreak high} & \texttt{fico\_\allowbreak midpoint\_\allowbreak scaled} \\
+12 & \texttt{bc\_\allowbreak open\_\allowbreak to\_\allowbreak buy} & \texttt{fico\_\allowbreak range\_\allowbreak high} & \texttt{term\_\allowbreak verification\_\allowbreak status\_\allowbreak 60 months\_\allowbreak \_\allowbreak Source Verified} & \texttt{fico\_\allowbreak range\_\allowbreak high} \\
+13 & \texttt{bc\_\allowbreak util} & \texttt{fico\_\allowbreak range\_\allowbreak low} & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths\_\allowbreak per\_\allowbreak credit\_\allowbreak history\_\allowbreak year} & \texttt{fico\_\allowbreak range\_\allowbreak low} \\
+14 & \texttt{total\_\allowbreak rev\_\allowbreak hi\_\allowbreak lim} & \texttt{fico\_\allowbreak band} & \texttt{term\_\allowbreak verification\_\allowbreak status\_\allowbreak 60 months\_\allowbreak \_\allowbreak Verified} & \texttt{fico\_\allowbreak band} \\
+15 & \texttt{revol\_\allowbreak util} & \texttt{total\_\allowbreak bc\_\allowbreak limit\_\allowbreak to\_\allowbreak loan\_\allowbreak amnt} & \texttt{fico\_\allowbreak range\_\allowbreak low} & \texttt{total\_\allowbreak bc\_\allowbreak limit\_\allowbreak to\_\allowbreak loan\_\allowbreak amnt} \\
+16 & \texttt{num\_\allowbreak actv\_\allowbreak rev\_\allowbreak tl} & \texttt{tot\_\allowbreak hi\_\allowbreak cred\_\allowbreak lim\_\allowbreak to\_\allowbreak loan\_\allowbreak amnt} & \texttt{loan\_\allowbreak to\_\allowbreak income} & \texttt{tot\_\allowbreak hi\_\allowbreak cred\_\allowbreak lim\_\allowbreak to\_\allowbreak loan\_\allowbreak amnt} \\
+17 & \texttt{num\_\allowbreak rev\_\allowbreak tl\_\allowbreak bal\_\allowbreak gt\_\allowbreak 0} & \texttt{bc\_\allowbreak open\_\allowbreak to\_\allowbreak buy\_\allowbreak to\_\allowbreak loan\_\allowbreak amnt} & \texttt{log\_\allowbreak avg\_\allowbreak cur\_\allowbreak bal} & \texttt{bc\_\allowbreak open\_\allowbreak to\_\allowbreak buy\_\allowbreak to\_\allowbreak loan\_\allowbreak amnt} \\
+18 & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths} & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths\_\allowbreak per\_\allowbreak credit\_\allowbreak history\_\allowbreak year} & \texttt{fico\_\allowbreak midpoint\_\allowbreak scaled} & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths\_\allowbreak per\_\allowbreak credit\_\allowbreak history\_\allowbreak year} \\
+19 & \texttt{num\_\allowbreak tl\_\allowbreak op\_\allowbreak past\_\allowbreak 12m} & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths\_\allowbreak per\_\allowbreak total\_\allowbreak acc} & \texttt{loan\_\allowbreak amnt\_\allowbreak to\_\allowbreak income} & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths\_\allowbreak per\_\allowbreak total\_\allowbreak acc} \\
+20 & \texttt{credit\_\allowbreak history\_\allowbreak years} & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths\_\allowbreak share} & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths} & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths\_\allowbreak share} \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table*}
+
+\begin{table*}[htbp]
+\centering
+\scriptsize
+\begin{threeparttable}
+\caption{LendingClub v2, ranks 21 to 40 of the two CatBoost subsets of Table~\ref{tab:subsets_lendingclub}.}
+\label{tab:subsets_lendingclub_b}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{@{}rL{80mm}L{80mm}@{}}
+\toprule
+Rank & CatBoost: LLM then mRMR (LLM-assisted) & CatBoost: IV then Boruta (classical) \\
+\midrule
+21 & \texttt{sqrt\_\allowbreak avg\_\allowbreak cur\_\allowbreak bal} & \texttt{total\_\allowbreak rev\_\allowbreak hi\_\allowbreak lim\_\allowbreak to\_\allowbreak loan\_\allowbreak amnt} \\
+22 & \texttt{dti\_\allowbreak x\_\allowbreak bc\_\allowbreak util} & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths} \\
+23 & \texttt{total\_\allowbreak bc\_\allowbreak limit\_\allowbreak to\_\allowbreak loan\_\allowbreak amnt} & \texttt{log\_\allowbreak acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths} \\
+24 & \texttt{log\_\allowbreak acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths} & \texttt{avg\_\allowbreak cur\_\allowbreak bal\_\allowbreak to\_\allowbreak loan\_\allowbreak amnt} \\
+25 & \texttt{mort\_\allowbreak acc\_\allowbreak per\_\allowbreak open\_\allowbreak acc} & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths\_\allowbreak band} \\
+26 & \texttt{fico\_\allowbreak band\_\allowbreak x\_\allowbreak term\_\allowbreak prime\_\allowbreak \_\allowbreak 60 months} & \texttt{dti\_\allowbreak x\_\allowbreak bc\_\allowbreak util} \\
+27 & \texttt{num\_\allowbreak tl\_\allowbreak op\_\allowbreak past\_\allowbreak 12m\_\allowbreak per\_\allowbreak credit\_\allowbreak history\_\allowbreak year} & \texttt{dti} \\
+28 & \texttt{term\_\allowbreak home\_\allowbreak ownership\_\allowbreak 60 months\_\allowbreak \_\allowbreak MORTGAGE} & \texttt{prime\_\allowbreak fico\_\allowbreak flag} \\
+29 & \texttt{term\_\allowbreak verification\_\allowbreak status\_\allowbreak 36 months\_\allowbreak \_\allowbreak Not Verified} & \texttt{dti\_\allowbreak x\_\allowbreak revol\_\allowbreak util} \\
+30 & \texttt{num\_\allowbreak tl\_\allowbreak op\_\allowbreak past\_\allowbreak 12m\_\allowbreak per\_\allowbreak total\_\allowbreak acc} & \texttt{dti\_\allowbreak band} \\
+31 & \texttt{dti\_\allowbreak x\_\allowbreak revol\_\allowbreak util} & \texttt{tot\_\allowbreak cur\_\allowbreak bal\_\allowbreak to\_\allowbreak loan\_\allowbreak amnt} \\
+32 & \texttt{avg\_\allowbreak cur\_\allowbreak bal} & \texttt{num\_\allowbreak tl\_\allowbreak op\_\allowbreak past\_\allowbreak 12m\_\allowbreak per\_\allowbreak credit\_\allowbreak history\_\allowbreak year} \\
+33 & \texttt{loan\_\allowbreak to\_\allowbreak income\_\allowbreak x\_\allowbreak fico} & \texttt{loan\_\allowbreak to\_\allowbreak total\_\allowbreak credit\_\allowbreak limit\_\allowbreak v2} \\
+34 & \texttt{total\_\allowbreak bc\_\allowbreak limit\_\allowbreak per\_\allowbreak bc\_\allowbreak trade} & \texttt{loan\_\allowbreak to\_\allowbreak total\_\allowbreak limit} \\
+35 & \texttt{balance\_\allowbreak to\_\allowbreak high\_\allowbreak credit\_\allowbreak limit} & \texttt{acc\_\allowbreak open\_\allowbreak past\_\allowbreak 24mths\_\allowbreak per\_\allowbreak open\_\allowbreak acc} \\
+36 & \texttt{verification\_\allowbreak group\_\allowbreak x\_\allowbreak loan\_\allowbreak to\_\allowbreak income\_\allowbreak band\_\allowbreak verified\_\allowbreak \_\allowbreak extreme} & \texttt{balance\_\allowbreak to\_\allowbreak high\_\allowbreak credit\_\allowbreak limit} \\
+37 & \texttt{bc\_\allowbreak open\_\allowbreak to\_\allowbreak buy\_\allowbreak to\_\allowbreak loan\_\allowbreak amnt} & \texttt{log\_\allowbreak num\_\allowbreak tl\_\allowbreak op\_\allowbreak past\_\allowbreak 12m} \\
+38 & \texttt{dti\_\allowbreak band\_\allowbreak high} & \texttt{num\_\allowbreak tl\_\allowbreak op\_\allowbreak past\_\allowbreak 12m} \\
+39 & \texttt{fico\_\allowbreak band\_\allowbreak near\_\allowbreak prime} & \texttt{num\_\allowbreak tl\_\allowbreak op\_\allowbreak past\_\allowbreak 12m\_\allowbreak per\_\allowbreak total\_\allowbreak acc} \\
+40 & \texttt{mths\_\allowbreak since\_\allowbreak recent\_\allowbreak inq} & \texttt{num\_\allowbreak tl\_\allowbreak op\_\allowbreak past\_\allowbreak 12m\_\allowbreak share} \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table*}
+
+\begin{table*}[htbp]
+\centering
+\scriptsize
+\begin{threeparttable}
+\caption{Stability 2024, ranks 1 to 20: full-DEV subsets of the two family leaders under each backbone (primary held-out comparison of the main text), in selector order. The two logistic-regression subsets share 1 of 20 features; the two CatBoost subsets share 4 of 40 (continued in Table~\ref{tab:subsets_stability_b}).}
+\label{tab:subsets_stability}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{@{}rL{40mm}L{40mm}L{40mm}L{40mm}@{}}
+\toprule
+Rank & LR: Pure LLM (LLM-assisted) & LR: RFE CatBoost (classical) & CatBoost: Pure LLM (LLM-assisted) & CatBoost: CatBoost SHAP (classical) \\
+\midrule
+1 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdpdlast24m\_\allowbreak 143P} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak dpdmaxdateyear\_\allowbreak 596T\_\allowbreak \_\allowbreak mean} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdpdlast24m\_\allowbreak 143P} & \texttt{d1\_\allowbreak \_\allowbreak person\_\allowbreak \_\allowbreak sex\_\allowbreak 738L\_\allowbreak \_\allowbreak lexical\_\allowbreak mode} \\
+2 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdpdlast12m\_\allowbreak 727P} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak numberofoverdueinstlmax\_\allowbreak 1039L\_\allowbreak \_\allowbreak mean} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdpdlast12m\_\allowbreak 727P} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak mobilephncnt\_\allowbreak 593L} \\
+3 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdpdlast9m\_\allowbreak 1059P} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak price\_\allowbreak 1097A} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdpdlast9m\_\allowbreak 1059P} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak isbidproduct\_\allowbreak 1095L} \\
+4 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdpdlast6m\_\allowbreak 474P} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak dateofcredstart\_\allowbreak 739D\_\allowbreak \_\allowbreak mean} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdpdlast6m\_\allowbreak 474P} & \texttt{d1\_\allowbreak \_\allowbreak person\_\allowbreak \_\allowbreak incometype\_\allowbreak 1044T\_\allowbreak \_\allowbreak first\_\allowbreak by\_\allowbreak num\_\allowbreak group1} \\
+5 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdpdlast3m\_\allowbreak 392P} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak numberofoverdueinstlmax\_\allowbreak 1151L\_\allowbreak \_\allowbreak mean} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdpdlast3m\_\allowbreak 392P} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak avgdpdtolclosure24\_\allowbreak 3658938P} \\
+6 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdpdtolerance\_\allowbreak 374P} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak lastrejectdate\_\allowbreak 50D} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdpdtolerance\_\allowbreak 374P} & \texttt{d1\_\allowbreak \_\allowbreak person\_\allowbreak \_\allowbreak sex\_\allowbreak 738L\_\allowbreak \_\allowbreak first\_\allowbreak by\_\allowbreak num\_\allowbreak group1} \\
+7 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdbddpdtollast12m\_\allowbreak 3658940P} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdbddpdtollast12m\_\allowbreak 3658940P} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdbddpdtollast12m\_\allowbreak 3658940P} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak pmtnum\_\allowbreak 254L} \\
+8 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdbddpdlast1m\_\allowbreak 3658939P} & \texttt{d1\_\allowbreak \_\allowbreak applprev\_\allowbreak \_\allowbreak maxdpdtolerance\_\allowbreak 577P\_\allowbreak \_\allowbreak mean} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdbddpdlast1m\_\allowbreak 3658939P} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak dpdmaxdateyear\_\allowbreak 596T\_\allowbreak \_\allowbreak mean} \\
+9 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak avgdbddpdlast24m\_\allowbreak 3658932P} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak cb\_\allowbreak \_\allowbreak pmtssum\_\allowbreak 45A} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak avgdbddpdlast24m\_\allowbreak 3658932P} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak annuity\_\allowbreak 780A} \\
+10 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak avgdpdtolclosure24\_\allowbreak 3658938P} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak residualamount\_\allowbreak 856A\_\allowbreak \_\allowbreak mean} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak avgdpdtolclosure24\_\allowbreak 3658938P} & \texttt{d1\_\allowbreak \_\allowbreak person\_\allowbreak \_\allowbreak education\_\allowbreak 927M\_\allowbreak \_\allowbreak first\_\allowbreak by\_\allowbreak num\_\allowbreak group1} \\
+11 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak actualdpdtolerance\_\allowbreak 344P} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak pmtnum\_\allowbreak 254L} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak actualdpdtolerance\_\allowbreak 344P} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak cb\_\allowbreak \_\allowbreak pmtssum\_\allowbreak 45A} \\
+12 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinstlswithdpd10\_\allowbreak 728L} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak totalamount\_\allowbreak 6A\_\allowbreak \_\allowbreak sum} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinstlswithdpd10\_\allowbreak 728L} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak applicationscnt\_\allowbreak 867L} \\
+13 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinstlswithdpd5\_\allowbreak 4187116L} & \texttt{d1\_\allowbreak \_\allowbreak person\_\allowbreak \_\allowbreak birth\_\allowbreak 259D\_\allowbreak \_\allowbreak max} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinstlswithdpd5\_\allowbreak 4187116L} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak cb\_\allowbreak \_\allowbreak days90\_\allowbreak 310L} \\
+14 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinstlswithoutdpd\_\allowbreak 562L} & \texttt{d1\_\allowbreak \_\allowbreak person\_\allowbreak \_\allowbreak incometype\_\allowbreak 1044T\_\allowbreak \_\allowbreak first\_\allowbreak by\_\allowbreak num\_\allowbreak group1} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinstlswithoutdpd\_\allowbreak 562L} & \texttt{d1\_\allowbreak \_\allowbreak applprev\_\allowbreak \_\allowbreak education\_\allowbreak 1138M\_\allowbreak \_\allowbreak last\_\allowbreak by\_\allowbreak num\_\allowbreak group1} \\
+15 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinstpaidlate1d\_\allowbreak 3546852L} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinstlallpaidearly3d\_\allowbreak 817L} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinstpaidlate1d\_\allowbreak 3546852L} & \texttt{d1\_\allowbreak \_\allowbreak person\_\allowbreak \_\allowbreak birth\_\allowbreak 259D\_\allowbreak \_\allowbreak mean} \\
+16 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinstregularpaid\_\allowbreak 973L} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak overdueamountmax2\_\allowbreak 14A\_\allowbreak \_\allowbreak mean} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinstregularpaid\_\allowbreak 973L} & \texttt{d1\_\allowbreak \_\allowbreak tax\_\allowbreak registry\_\allowbreak a\_\allowbreak \_\allowbreak amount\_\allowbreak 4527230A\_\allowbreak \_\allowbreak sum} \\
+17 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinsttopaygr\_\allowbreak 769L} & \texttt{d1\_\allowbreak \_\allowbreak tax\_\allowbreak registry\_\allowbreak a\_\allowbreak \_\allowbreak amount\_\allowbreak 4527230A\_\allowbreak \_\allowbreak sum} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinsttopaygr\_\allowbreak 769L} & \texttt{d1\_\allowbreak \_\allowbreak tax\_\allowbreak registry\_\allowbreak a\_\allowbreak \_\allowbreak row\_\allowbreak count} \\
+18 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinstunpaidmax\_\allowbreak 3546851L} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak cb\_\allowbreak \_\allowbreak days90\_\allowbreak 310L} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numinstunpaidmax\_\allowbreak 3546851L} & \texttt{d1\_\allowbreak \_\allowbreak applprev\_\allowbreak \_\allowbreak maxdpdtolerance\_\allowbreak 577P\_\allowbreak \_\allowbreak mean} \\
+19 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak pctinstlsallpaidlat10d\_\allowbreak 839L} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak totalamount\_\allowbreak 996A\_\allowbreak \_\allowbreak max} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak pctinstlsallpaidlat10d\_\allowbreak 839L} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak financialinstitution\_\allowbreak 591M\_\allowbreak \_\allowbreak first\_\allowbreak by\_\allowbreak num\_\allowbreak group1} \\
+20 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak pctinstlsallpaidlate1d\_\allowbreak 3546856L} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak overdueamountmax\_\allowbreak 35A\_\allowbreak \_\allowbreak mean} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak pctinstlsallpaidlate1d\_\allowbreak 3546856L} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak refreshdate\_\allowbreak 3813885D\_\allowbreak \_\allowbreak min} \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table*}
+
+\begin{table*}[htbp]
+\centering
+\scriptsize
+\begin{threeparttable}
+\caption{Stability 2024, ranks 21 to 40 of the two CatBoost subsets of Table~\ref{tab:subsets_stability}.}
+\label{tab:subsets_stability_b}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{@{}rL{80mm}L{80mm}@{}}
+\toprule
+Rank & CatBoost: Pure LLM (LLM-assisted) & CatBoost: CatBoost SHAP (classical) \\
+\midrule
+21 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak pctinstlsallpaidlate4d\_\allowbreak 3546849L} & \texttt{d1\_\allowbreak \_\allowbreak tax\_\allowbreak registry\_\allowbreak c\_\allowbreak \_\allowbreak row\_\allowbreak count} \\
+22 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak pctinstlsallpaidlate6d\_\allowbreak 3546844L} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak lastrejectdate\_\allowbreak 50D} \\
+23 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak pctinstlsallpaidearl3d\_\allowbreak 427L} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak dateofcredstart\_\allowbreak 739D\_\allowbreak \_\allowbreak min} \\
+24 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak amtinstpaidbefduel24m\_\allowbreak 4187115A} & \texttt{d1\_\allowbreak \_\allowbreak applprev\_\allowbreak \_\allowbreak status\_\allowbreak 219L\_\allowbreak \_\allowbreak lexical\_\allowbreak mode} \\
+25 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak avginstallast24m\_\allowbreak 3658937A} & \texttt{d1\_\allowbreak \_\allowbreak person\_\allowbreak \_\allowbreak incometype\_\allowbreak 1044T\_\allowbreak \_\allowbreak lexical\_\allowbreak mode} \\
+26 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxinstallast24m\_\allowbreak 3658928A} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak dateofcredstart\_\allowbreak 739D\_\allowbreak \_\allowbreak mean} \\
+27 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxoutstandbalancel12m\_\allowbreak 4187113A} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak lastrejectreason\_\allowbreak 759M} \\
+28 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak sumoutstandtotal\_\allowbreak 3546847A} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak eir\_\allowbreak 270L} \\
+29 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak totaldebt\_\allowbreak 9A} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak lastdelinqdate\_\allowbreak 224D} \\
+30 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak currdebt\_\allowbreak 22A} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak overdueamountmaxdateyear\_\allowbreak 2T\_\allowbreak \_\allowbreak mean} \\
+31 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak currdebtcredtyperange\_\allowbreak 828A} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak cntpmts24\_\allowbreak 3658933L} \\
+32 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak disbursedcredamount\_\allowbreak 1113A} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak dpdmax\_\allowbreak 139P\_\allowbreak \_\allowbreak first\_\allowbreak by\_\allowbreak num\_\allowbreak group1} \\
+33 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak credamount\_\allowbreak 770A} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdbddpdtollast12m\_\allowbreak 3658940P} \\
+34 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak totalsettled\_\allowbreak 863A} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak dpdmax\_\allowbreak 139P\_\allowbreak \_\allowbreak mean} \\
+35 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak downpmt\_\allowbreak 116A} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak dpdmax\_\allowbreak 757P\_\allowbreak \_\allowbreak mean} \\
+36 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak annuity\_\allowbreak 780A} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak price\_\allowbreak 1097A} \\
+37 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak monthsannuity\_\allowbreak 845L} & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak disbursedcredamount\_\allowbreak 1113A} \\
+38 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak maxdebt4\_\allowbreak 972A} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak numberofoverdueinstlmaxdat\_\allowbreak 148D\_\allowbreak \_\allowbreak max} \\
+39 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numactivecreds\_\allowbreak 622L} & \texttt{d1\_\allowbreak \_\allowbreak person\_\allowbreak \_\allowbreak birth\_\allowbreak 259D\_\allowbreak \_\allowbreak first\_\allowbreak by\_\allowbreak num\_\allowbreak group1} \\
+40 & \texttt{d0\_\allowbreak \_\allowbreak static\_\allowbreak \_\allowbreak numactiverelcontr\_\allowbreak 750L} & \texttt{d1\_\allowbreak \_\allowbreak credit\_\allowbreak bureau\_\allowbreak a\_\allowbreak \_\allowbreak overdueamountmax2date\_\allowbreak 1142D\_\allowbreak \_\allowbreak max} \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table*}
+
+\end{document}
